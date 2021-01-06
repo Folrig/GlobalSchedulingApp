@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package globalschedulingapp;
+package model;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import utilities.DatabaseConnection;
 
 /**
  *
@@ -21,8 +22,9 @@ public class GlobalSchedulingApp extends Application{
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        DatabaseConnection.connectionInit();
         launch(args);
+        DatabaseConnection.connectionTerminate();
     }
 
     @Override
