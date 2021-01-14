@@ -32,6 +32,7 @@ public class GlobalSchedulingApp extends Application{
         Parent root = FXMLLoader.load(getClass().getResource("/view/LoginView.fxml"));
         Scene scene = new Scene(root);
         stage.setTitle("Login");
+        stage.setScene(scene);
         stage.show();
     }
 }
