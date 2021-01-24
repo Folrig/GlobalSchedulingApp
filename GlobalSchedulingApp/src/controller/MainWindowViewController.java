@@ -21,7 +21,6 @@ import javafx.scene.control.ToggleGroup;
  * @author James Spencer
  */
 public class MainWindowViewController implements Initializable {
-    
     @FXML
     private TableView<?> scheduleTableView;
 
@@ -53,10 +52,13 @@ public class MainWindowViewController implements Initializable {
     private TableColumn<?, ?> custIdColumn;
 
     @FXML
-    private Button apptAudButton;
+    private Button apptAddButton;
 
     @FXML
     private Button custAudButton;
+
+    @FXML
+    private Button deleteApptButton;
 
     @FXML
     private RadioButton weeklyViewRadioButton;
