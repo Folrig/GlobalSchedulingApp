@@ -8,6 +8,7 @@ package utilities;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -15,14 +16,14 @@ import java.sql.Statement;
  */
 public class Query {
     // Statement reference
-    private static Statement statement;
+    private static PreparedStatement statement;
     
     // Create Statement Object
-    public static void setStatement(Connection connection) throws SQLException {
-        statement = connection.createStatement();
+    public static void setPreparedStatement(Connection connection, String query) throws SQLException {
+        statement = connection.prepareStatement(query);
     }
     
-    public static Statement getStatement() {
+    public static PreparedStatement getPreparedStatement() {
         return statement;
     }
 }

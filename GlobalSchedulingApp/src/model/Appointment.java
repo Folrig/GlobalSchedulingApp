@@ -6,6 +6,8 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  *
@@ -17,19 +19,19 @@ public class Appointment {
     private String description;
     private String location;
     private String type;
-    private LocalDate startTime;
-    private LocalDate endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private LocalDate createDate;
     private String createdBy;
-    private LocalDate lastUpdate;
+    private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private int customerId;
     private int userId;
     private int contactId;
     
     public Appointment(int id, String title, String description, String location, String type, 
-            LocalDate startTime, LocalDate endTime, LocalDate createDate, String createdBy, 
-            LocalDate lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) {
+            LocalTime startTime, LocalTime endTime, LocalDate createDate, String createdBy, 
+            LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -86,19 +88,19 @@ public class Appointment {
         this.type = type;
     }
 
-    public LocalDate getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDate startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDate getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDate endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
@@ -118,11 +120,11 @@ public class Appointment {
         this.createdBy = createdBy;
     }
 
-    public LocalDate getLastUpdate() {
+    public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDate lastUpdate) {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
