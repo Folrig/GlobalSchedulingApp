@@ -41,12 +41,10 @@ public class GlobalSchedulingApp extends Application{
      */
     public static void main(String[] args) throws SQLException {
      
-        Connection connection = DatabaseConnection.connectionInit();
-        DataHandler.connection = connection;
+        Connection conn = DatabaseConnection.connectionInit();
+        DataHandler.connection = conn;
         DataHandler.setAllAppointments();
-        
-        // DataHandler.addAppointment("Hello", "there", "General" "Kenobi", "00:10:10".toL, STYLESHEET_CASPIAN, STYLESHEET_CASPIAN, STYLESHEET_MODENA, LocalTime.MIN, LocalTime.MIN, LocalDate.MAX, STYLESHEET_MODENA, LocalDateTime.MAX, STYLESHEET_MODENA, 0, 0, 0);
-        
+
         launch(args);
         DatabaseConnection.connectionTerminate();
     }
