@@ -17,6 +17,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -30,8 +31,10 @@ public class DataHandler {
         public static ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
         public static ObservableList<FirstLevelDivision> allFirstLvlDivs = FXCollections.observableArrayList();
         public static ObservableList<User> allUsers = FXCollections.observableArrayList();
+        public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         private static String query;
         private static PreparedStatement prepStmt;
+        
         
     public static void setAllAppointments() throws SQLException {
         query = "SELECT * FROM appointments";
@@ -46,9 +49,9 @@ public class DataHandler {
             String descrip = results.getString("Description");
             String location = results.getString("Location");
             String type = results.getString("Type");
-            LocalTime startTime = results.getTime("Start").toLocalTime();
-            LocalTime endTime = results.getTime("End").toLocalTime();
-            LocalDate createDate = results.getDate("Create_Date").toLocalDate();
+            LocalDateTime startTime = results.getTimestamp("Start").toLocalDateTime();
+            LocalDateTime endTime = results.getTimestamp("End").toLocalDateTime();
+            LocalDateTime createDate = results.getTimestamp("Create_Date").toLocalDateTime();
             String createdBy = results.getString("Created_By");
             LocalDateTime lastUpdate = results.getTimestamp("Last_Update").toLocalDateTime();
             String lastUpdateBy = results.getString("Last_Updated_By");
@@ -62,12 +65,14 @@ public class DataHandler {
         }
     }
     
-    public static void addAppointment(String title, String description, String location, String type, 
-            LocalTime startTime, LocalTime endTime, LocalDate createDate, String createdBy, 
+    public static void createAppointment(String title, String description, String location, String type, 
+            LocalDateTime startTime, LocalDateTime endTime, LocalDateTime createDate, String createdBy, 
             LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) throws SQLException {
-        query = "INSERT INTO appoinments(Title, Description, Location, Type, Start, End, Created_Date,"
-                + "Created_By, Last_Update, Last_Updated_By, Customer_ID, User_ID, Contact_ID) VALUES"
-                + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        query = "INSERT INTO appointments(Title, Description, Location, Type, Start, End, Create_Date, "
+                + "Created_By, Last_Update, Last_Updated_By, Customer_ID, User_ID, Contact_ID) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, title);
         prepStmt.setString(2, description);
         prepStmt.setString(3, location);
@@ -81,13 +86,13 @@ public class DataHandler {
         prepStmt.setString(11, String.valueOf(customerId));
         prepStmt.setString(12, String.valueOf(userId));
         prepStmt.setString(13, String.valueOf(contactId));
-        prepStmt = Query.getPreparedStatement();
         prepStmt.execute();
         
-        query = "SELECT id FROM appointments WHERE title = ? AND description = ?";
+        query = "SELECT Appointment_ID FROM appointments WHERE title = ? AND description = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, title);
         prepStmt.setString(2, description);
-        prepStmt = Query.getPreparedStatement();
         prepStmt.execute();
         ResultSet results = prepStmt.getResultSet();
         int id = 0;
@@ -100,6 +105,46 @@ public class DataHandler {
             allAppts.add(appt);
         } else {
             System.out.println("Problem in addAppointment!");
+        }
+    }
+    
+    public static ObservableList readAppointments() {
+        return allAppts;
+    }
+    
+    public static void updateAppointment(int id, String title, String description, String location, String type, 
+            LocalDateTime startTime, LocalDateTime endTime, LocalDateTime createDate, String createdBy, 
+            LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) throws SQLException {
+        
+        // Update entry in database
+        query = "UPDATE appointments SET Title = ?, Description = ?, Location = ?, Type = ?, Start = ?, "
+                + "End = ?, Create_Date = ?, Created_By = ?, Last_Update = ?, Last_Updated_By = ?, "
+                + "Customer_ID = ?, User_ID = ?, Contact_ID = ?) WHERE Appointment_ID = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, title);
+        prepStmt.setString(2, description);
+        prepStmt.setString(3, location);
+        prepStmt.setString(4, type);
+        prepStmt.setString(5, startTime.toString());
+        prepStmt.setString(6, endTime.toString());
+        prepStmt.setString(7, createDate.toString());
+        prepStmt.setString(8, createdBy);
+        prepStmt.setString(9, lastUpdate.toString());
+        prepStmt.setString(10, lastUpdateBy);
+        prepStmt.setString(11, String.valueOf(customerId));
+        prepStmt.setString(12, String.valueOf(userId));
+        prepStmt.setString(13, String.valueOf(contactId));
+        prepStmt.setString(14, String.valueOf(id));
+        prepStmt.execute();
+        
+        final int tempId = id;
+        // Find entry in observable list, delete it, and add a new one to replace it
+        if (id != 0) {
+            allAppts.removeIf(appointment -> appointment.getId() == tempId);
+            Appointment appt = new Appointment(id, title, description, location, type, startTime, endTime, createDate,
+                createdBy, lastUpdate, lastUpdateBy, customerId, userId, contactId);
+            allAppts.add(appt);
         }
     }
 }
