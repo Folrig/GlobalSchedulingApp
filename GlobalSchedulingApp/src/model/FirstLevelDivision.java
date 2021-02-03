@@ -6,6 +6,7 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -14,13 +15,13 @@ import java.time.LocalDate;
 public class FirstLevelDivision {
     private int id;
     private String name;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
     private String createdBy;
-    private LocalDate lastUpdate;
+    private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private int countryId;
     
-    public FirstLevelDivision(int id, String name, LocalDate createDate, String createdBy, LocalDate lastUpdate, String lastUpdateBy, int countryId) {
+    public FirstLevelDivision(int id, String name, LocalDateTime createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy, int countryId) {
         this.id = id;
         this.name = name;
         this.createDate = createDate;
@@ -46,11 +47,11 @@ public class FirstLevelDivision {
         this.name = name;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDate createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -62,11 +63,11 @@ public class FirstLevelDivision {
         this.createdBy = createdBy;
     }
 
-    public LocalDate getLastUpdate() {
+    public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDate lastUpdate) {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

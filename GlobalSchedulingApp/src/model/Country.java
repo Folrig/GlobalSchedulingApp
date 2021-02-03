@@ -6,6 +6,7 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,21 +17,22 @@ import javafx.collections.ObservableList;
 public class Country {
     private int id;
     private String name;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
     private String createdBy;
-    private LocalDate lastUpdate;
+    private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private ObservableList<FirstLevelDivision> associatedDivisions = 
             FXCollections.observableArrayList();
     
-    public Country(int id, String name, LocalDate createDate, String createdBy, 
-            LocalDate lastUpdate, String lastUpdateBy) {
+    public Country(int id, String name, LocalDateTime createDate, String createdBy, 
+            LocalDateTime lastUpdate, String lastUpdateBy, ObservableList<FirstLevelDivision> divs) {
         this.id = id;
         this.name = name;
         this.createDate = createDate;
         this.createdBy = createdBy;
         this.lastUpdate = lastUpdate;
         this.lastUpdateBy = lastUpdateBy;
+        this.associatedDivisions = divs;
     }
     
     public int getId() {
@@ -49,11 +51,11 @@ public class Country {
         this.name = name;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDate createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -65,11 +67,11 @@ public class Country {
         this.createdBy = createdBy;
     }
 
-    public LocalDate getLastUpdate() {
+    public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDate lastUpdate) {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
