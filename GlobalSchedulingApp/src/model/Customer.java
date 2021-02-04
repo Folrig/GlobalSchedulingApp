@@ -6,6 +6,7 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -19,14 +20,14 @@ public class Customer {
     private String address;
     private String postalCode;
     private String phoneNum;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
     private String createBy;
-    private LocalDate lastUpdate;
+    private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private int divisionId;
     private ObservableList<Appointment> appointments = FXCollections.observableArrayList();
     
-    public Customer(int id, String name, String address, String postalCode, String phoneNum, LocalDate createDate, String createBy, LocalDate lastUpdate, String lastUpdateBy, int divisionId) {
+    public Customer(int id, String name, String address, String postalCode, String phoneNum, LocalDateTime createDate, String createBy, LocalDateTime lastUpdate, String lastUpdateBy, int divisionId) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -79,11 +80,11 @@ public class Customer {
         this.phoneNum = phoneNum;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDate createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -95,11 +96,11 @@ public class Customer {
         this.createBy = createBy;
     }
 
-    public LocalDate getLastUpdate() {
+    public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDate lastUpdate) {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

@@ -14,15 +14,14 @@ import model.Customer;
 import model.FirstLevelDivision;
 import model.User;
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  *
  * @author James Spencer
  */
+// POTENTIAL TODO: USERS MIGHT HAVE APPOINTMENTS, MIGHT NOT BE NECESSARY FOR ASSESSMENT!
 public class DataHandler {
         public static Connection connection = null;
         public static ObservableList<Appointment> allAppts = FXCollections.observableArrayList();
@@ -147,32 +146,28 @@ public class DataHandler {
         prepStmt.execute();
         
         final int tempId = id;
-        // Find entry in observable list, delete it, and add a new one to replace it
+        // Find entry in observable lists, delete them, and add a new one to replace it
         if (id != 0) {
-            // for every contact in all contacts
-            // if the updated appointment contact ID is the contact ID
-            // remove it from their appointment observable list
-            // This is an ugly n^2 but oh well
-            // Possible error because of removing objects in a list while iterating
+            allAppts.removeIf(appointment -> appointment.getId() == tempId);
+            Appointment newAppt = new Appointment(id, title, description, location, type, startTime, endTime, createDate,
+                createdBy, lastUpdate, lastUpdateBy, customerId, userId, contactId);
+            allAppts.add(newAppt);
+            // This logic might be iffy, check here if bugs occur
             for (Contact contact : allContacts) {
                 for (Appointment appt : contact.getAllAppointments()) {
-                    if (appt.getContactId() == contact.getId()) {
+                    if (appt.getId() == newAppt.getId()) {
                         contact.deleteAppointment(appt);
                     }
                 }
             }
             for (Customer customer : allCustomers) {
                 for (Appointment appt : customer.getAllAppointments()) {
-                    if (appt.getContactId() == customer.getId()) {
+                    if (appt.getId() == newAppt.getId()) {
                         customer.deleteAppointment(appt);
                     }
                 }
             }
             
-            allAppts.removeIf(appointment -> appointment.getId() == tempId);
-            Appointment newAppt = new Appointment(id, title, description, location, type, startTime, endTime, createDate,
-                createdBy, lastUpdate, lastUpdateBy, customerId, userId, contactId);
-            allAppts.add(newAppt);
             for (Contact contact : allContacts) {
                 if (contact.getId() == newAppt.getContactId()) {
                     contact.addAppointment(newAppt);
@@ -197,6 +192,20 @@ public class DataHandler {
         if (id != 0) {
             allAppts.removeIf(appointment -> appointment.getId() == tempId);
         }
+        for (Contact contact : allContacts) {
+            for (Appointment appt : contact.getAllAppointments()) {
+                if (appt.getId() == tempId) {
+                    contact.deleteAppointment(appt);
+                }
+            }
+        }
+        for (Customer customer : allCustomers) {
+            for (Appointment appt : customer.getAllAppointments()) {
+                if (appt.getId() == tempId) {
+                    customer.deleteAppointment(appt);
+                }
+            }
+        }
     }
     
     // UNTESTED
@@ -214,7 +223,9 @@ public class DataHandler {
 
             Contact contact = new Contact(id, name, email);
             allContacts.add(contact);      
-            allAppts.stream().filter((appt) -> (appt.getContactId() == contact.getId())).forEachOrdered((appt) -> {
+            allAppts.stream().filter((appt) -> {
+                return appt.getContactId() == contact.getId();
+            }).forEachOrdered((appt) -> {
                 contact.addAppointment(appt);
             });
         }
@@ -257,7 +268,7 @@ public class DataHandler {
     // UNTESTED, possible issue with lambda
     public static void updateContact(int id, String name, String email) throws SQLException {
         // Update entry in database
-        query = "UPDATE contacts SET name = ?, email = ? WHERE Contact_ID = ?";
+        query = "UPDATE contacts SET Contact_Name = ?, Email = ? WHERE Contact_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, name);
@@ -352,4 +363,218 @@ public class DataHandler {
     public static ObservableList readCountries() {
         return allCountries;
     }
+    // UNTESTED
+    public static void setAllCustomers() throws SQLException {
+        query = "SELECT * FROM customers";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.execute();
+        ResultSet results = prepStmt.getResultSet();
+
+        while(results.next()) {
+            int id = results.getInt("Customer_ID");
+            String name = results.getString("Customer_Name");
+            String address = results.getString("Address");
+            String postalCode = results.getString("Postal_Code");
+            String phoneNum = results.getString("Phone");
+            LocalDateTime createDate = results.getTimestamp("Create_Date").toLocalDateTime();
+            String createdBy = results.getString("Created_By");
+            LocalDateTime lastUpdate = results.getTimestamp("Last_Update").toLocalDateTime();
+            String lastUpdateBy = results.getString("Last_Updated_By");
+            int divId = results.getInt("Division_ID");
+
+            Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
+                createdBy, lastUpdate, lastUpdateBy, divId);
+            allCustomers.add(newCust);      
+            allAppts.stream().filter((Appointment appt) -> {
+                return appt.getCustomerId() == newCust.getId();
+            }).forEachOrdered((appt) -> {
+                newCust.addAppointment(appt);
+            });
+        }
+    }
+    // UNTESTED
+    public static void createCustomer(String name, String address, String postalCode, String phoneNum,
+            LocalDateTime createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy,
+            int divId) throws SQLException {
+        query = "INSERT INTO customers(Customer_Name, Address, Postal_Code, Phone, Create_Date, " +
+                "Created_By, Last_Update, Last_Updated_By, Division_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, address);
+        prepStmt.setString(3, postalCode);
+        prepStmt.setString(4, phoneNum);
+        prepStmt.setString(5, createDate.toString());
+        prepStmt.setString(6, createdBy);
+        prepStmt.setString(7, lastUpdate.toString());
+        prepStmt.setString(8, lastUpdateBy);
+        prepStmt.setString(9, String.valueOf(divId));
+        prepStmt.execute();
+
+        query = "SELECT Customer_ID FROM customers WHERE Customer_Name = ? AND Address = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, address);
+        prepStmt.execute();
+        ResultSet results = prepStmt.getResultSet();
+        int id = 0;
+        while(results.next()) {
+            id = results.getInt("Customer_ID");
+        }
+        if (id != 0) {
+            Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
+                createdBy, lastUpdate, lastUpdateBy, divId);
+            allCustomers.add(newCust);
+        } else {
+            System.out.println("Problem in createCustomer");
+        }
+    }
+    public static ObservableList readCustomers() {
+        return allCustomers;
+    }
+    // UNTESTED
+    public static void updateCustomer(int id, String name, String address, String postalCode, String phoneNum,
+            LocalDateTime createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy,
+            int divId) throws SQLException {
+        // Update entry in database
+        query = "UPDATE customers SET Customer_Name = ?, Address = ?, Postal_Code = ?, Phone = ?, " +
+                "Create_Date = ?, Created_By = ?, Last_Update = ?, Last_Updated_By = ?, Division_ID = ? " +
+                "WHERE Customer_ID = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, address);
+        prepStmt.setString(3, postalCode);
+        prepStmt.setString(4, phoneNum);
+        prepStmt.setString(5, createDate.toString());
+        prepStmt.setString(6, createdBy);
+        prepStmt.setString(7, lastUpdate.toString());
+        prepStmt.setString(8, lastUpdateBy);
+        prepStmt.setString(9, String.valueOf(divId));
+        prepStmt.setString(10, String.valueOf(id));
+        prepStmt.execute();
+
+        final int tempId = id;
+        // Find entry in observable list, delete it, and add a new one to replace it
+        if (id != 0) {
+            allCustomers.removeIf(customer -> customer.getId() == tempId);
+            Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
+                createdBy, lastUpdate, lastUpdateBy, divId);
+            allCustomers.add(newCust);
+        }
+    }
+    // UNTESTED
+    public static void deleteCustomer(int id) throws SQLException {
+        query = "DELETE FROM customers WHERE Customer_ID = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.execute();
+
+        final int tempId = id;
+        if (id != 0) {
+            allCustomers.removeIf(customer -> {
+                return customer.getId() == tempId;
+            });
+        }
+    }
+    // UNTESTED
+    public static void setAllUsers() throws SQLException {
+        query = "SELECT * FROM users";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.execute();
+        ResultSet results = prepStmt.getResultSet();
+        
+        while(results.next()) {
+            int id = results.getInt("User_ID");
+            String name = results.getString("User_Name");
+            String password = results.getString("Password");
+            LocalDateTime createDate = results.getTimestamp("Create_Date").toLocalDateTime();
+            String createdBy = results.getString("Created_By");
+            LocalDateTime lastUpdate = results.getTimestamp("Last_Update").toLocalDateTime();
+            String lastUpdateBy = results.getString("Last_Updated_By");
+
+            User user = new User(id, name, password, createDate, createdBy, lastUpdate, lastUpdateBy);
+            allUsers.add(user);
+        }
+    }
+    // UNTESTED
+    public static void createUser(String name, String password, LocalDateTime createDate,
+            String createdBy, LocalDateTime lastUpdate, String lastUpdateBy) throws SQLException {
+        query = "INSERT INTO users(User_Name, Password, Create_Date, Create_By, Last_Update, Last_Updated_by) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, password);
+        prepStmt.setString(3, createDate.toString());
+        prepStmt.setString(4, createdBy);
+        prepStmt.setString(5, lastUpdate.toString());
+        prepStmt.setString(6, lastUpdateBy);
+        prepStmt.execute();
+
+        query = "SELECT User_ID FROM users WHERE User_Name = ? AND Password = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, password);
+        prepStmt.execute();
+        ResultSet results = prepStmt.getResultSet();
+        int id = 0;
+        while(results.next()) {
+            id = results.getInt("User_ID");
+        }
+        if (id != 0) {
+            User user = new User(id, name, password, createDate, createdBy, lastUpdate, lastUpdateBy);
+            allUsers.add(user);
+        } else {
+            System.out.println("Problem in createUser");
+        }
+    }
+    public static ObservableList readUsers() {
+        return allUsers;
+    }
+    // UNTESTED, possible issue with lambda
+    public static void updateUser(int id, String name, String password, LocalDateTime createDate,
+            String createdBy, LocalDateTime lastUpdate, String lastUpdateBy) throws SQLException {
+        // Update entry in database
+        query = "UPDATE users SET User_Name = ?, Password = ?, Create_Date = ?, Created_By = ?, " +
+                "Last_Update = ?, Last_Updated_By = ? WHERE Contact_ID = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, name);
+        prepStmt.setString(2, password);
+        prepStmt.setString(3, createDate.toString());
+        prepStmt.setString(4, createdBy);
+        prepStmt.setString(5, lastUpdate.toString());
+        prepStmt.setString(6, lastUpdateBy);
+        prepStmt.setString(7, String.valueOf(id));
+        prepStmt.execute();
+
+        final int tempId = id;
+        // Find entry in observable list, delete it, and add a new one to replace it
+        if (id != 0) {
+            allUsers.removeIf(user -> user.getId() == tempId);
+            User user = new User(id, name, password, createDate, createdBy, lastUpdate, lastUpdateBy);
+            allUsers.add(user);
+        }
+    }
+    // UNTESTED
+    public static void deleteUser(int id) throws SQLException {
+        query = "DELETE FROM users WHERE User_ID = ?";
+        Query.setPreparedStatement(connection, query);
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.execute();
+
+        final int tempId = id;
+        if (id != 0) {
+            allUsers.removeIf(user -> user.getId() == tempId);
+        }
+    }
+    
 }

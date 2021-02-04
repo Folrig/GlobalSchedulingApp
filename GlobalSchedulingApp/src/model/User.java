@@ -6,6 +6,7 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -17,14 +18,14 @@ public class User {
     private int id;
     private String name;
     private String password;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
     private String createBy;
-    private LocalDate lastUpdate;
+    private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private ObservableList<Appointment> appointments = FXCollections.observableArrayList();
     
-    public User(int id, String name, String password, LocalDate createDate, String createBy, 
-            LocalDate lastUpdate, String lastUpdateBy) {
+    public User(int id, String name, String password, LocalDateTime createDate, String createBy, 
+            LocalDateTime lastUpdate, String lastUpdateBy) {
         this.id = id;
         this.name = name;
         this.password = password;
@@ -58,11 +59,11 @@ public class User {
         this.password = password;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDate createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -74,11 +75,11 @@ public class User {
         this.createBy = createBy;
     }
 
-    public LocalDate getLastUpdate() {
+    public LocalDateTime getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(LocalDate lastUpdate) {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
