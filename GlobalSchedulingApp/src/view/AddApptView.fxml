@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ApptModViewController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddApptViewController">
    <children>
       <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0">
         <columnConstraints>
@@ -26,7 +26,7 @@
           <RowConstraints minHeight="10.0" percentHeight="22.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="apptModLabel" text="Modify Appointment Form" underline="true" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="apptModLabel" text="Add Appointment Form" underline="true" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font name="Dubai Bold" size="36.0" />
                </font>
@@ -124,7 +124,10 @@
                         <Insets right="5.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="apptIdTextField" editable="false" style="-fx-background-color: #e4e4e4;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="apptIdTextField" editable="false" style="-fx-background-color: #e4e4e4;" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></TextField>
                   <Label text="Customer ID:" GridPane.halignment="RIGHT">
                      <font>
                         <Font name="Dubai Regular" size="14.0" />
@@ -215,7 +218,7 @@
                   <Font name="Dubai Bold" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="modApptButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onModApptButtonClicked" prefHeight="50.0" prefWidth="140.0" text="Modify Appointment" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <Button fx:id="addApptButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onAddApptButtonClicked" prefHeight="50.0" prefWidth="140.0" text="Add Appointment" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="35.0" />
                </GridPane.margin>

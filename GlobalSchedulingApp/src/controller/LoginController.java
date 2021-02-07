@@ -7,6 +7,7 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -30,36 +31,17 @@ public class LoginController implements Initializable {
     Stage stage;
     Parent scene;
     
-    @FXML
-    private Label titleLabel;
-
-    @FXML
-    private Label loginLabel;
-
-    @FXML
-    private Label usernameLabel;
-
-    @FXML
-    private Label passwordLabel;
-
-    @FXML
-    private TextField usernameTextField;
-
-    @FXML
-    private TextField passwordTextField;
-
-    @FXML
-    private Label currentLocationLabel;
-
-    @FXML
-    private Label locationLabel;
-
-    @FXML
-    private Button loginBtn;
-
-    @FXML
-    private Button exitBtn;
-
+    @FXML private Label titleLabel;
+    @FXML private Label loginLabel;
+    @FXML private Label usernameLabel;
+    @FXML private Label passwordLabel;
+    @FXML private TextField usernameTextField;
+    @FXML private TextField passwordTextField;
+    @FXML private Label currentLocationLabel;
+    @FXML private Label locationLabel;
+    @FXML private Button loginBtn;
+    @FXML private Button exitBtn;
+    
     @FXML
     void onExitBtnClicked(ActionEvent event) {
         System.exit(0);
@@ -78,6 +60,7 @@ public class LoginController implements Initializable {
             scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
             stage.setScene(new Scene(scene));
             stage.show();
+            stage.centerOnScreen();
         }
     }
     
@@ -94,6 +77,16 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        Locale locale = Locale.getDefault();
+        if (locale.toString().contains("en")) {
+            // SET LANGAUGE PACK HERE AND ALL LABELS HERE
+            // BELOW IS JUST A TEST
+            currentLocationLabel.setText("United States");
+        }
+        if (locale.toString().contains("fr")) {
+            // SET LANGUAGE PACK AND ALL LABELS HERE
+            // BELOW IS JUST A TEST
+            currentLocationLabel.setText("France");
+        }
     }    
 }

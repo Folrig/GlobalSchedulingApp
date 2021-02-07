@@ -6,20 +6,13 @@
 package model;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import utilities.DatabaseConnection;
-import utilities.Query;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import utilities.DataHandler;
 
 /**
@@ -43,8 +36,12 @@ public class GlobalSchedulingApp extends Application{
      
         Connection conn = DatabaseConnection.connectionInit();
         DataHandler.connection = conn;
+        DataHandler.setAllCountries();
         DataHandler.setAllAppointments();
-
+        DataHandler.setAllUsers();
+        DataHandler.setAllContacts();
+        DataHandler.setAllCustomers();
+        
         launch(args);
         DatabaseConnection.connectionTerminate();
     }

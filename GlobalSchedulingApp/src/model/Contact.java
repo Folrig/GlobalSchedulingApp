@@ -59,4 +59,9 @@ public class Contact {
     public boolean deleteAppointment(Appointment appt) {
         return appointments.remove(appt);
     }
+    
+    @Override
+    public String toString() {
+        return String.valueOf(this.getId());
+    }
 }

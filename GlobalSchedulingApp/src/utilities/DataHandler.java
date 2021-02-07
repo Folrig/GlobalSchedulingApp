@@ -23,6 +23,9 @@ import java.time.format.DateTimeFormatter;
  */
 // POTENTIAL TODO: USERS MIGHT HAVE APPOINTMENTS, MIGHT NOT BE NECESSARY FOR ASSESSMENT!
 public class DataHandler {
+        public static boolean addAppointment = false;
+        public static Appointment apptToModify = null;
+        public static Customer custToModify = null;
         public static Connection connection = null;
         public static ObservableList<Appointment> allAppts = FXCollections.observableArrayList();
         public static ObservableList<Contact> allContacts = FXCollections.observableArrayList();
@@ -36,6 +39,7 @@ public class DataHandler {
         
         
     public static void setAllAppointments() throws SQLException {
+        allAppts.clear();
         query = "SELECT * FROM appointments";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
@@ -101,16 +105,6 @@ public class DataHandler {
             Appointment appt = new Appointment(id, title, description, location, type, startTime, endTime, createDate,
                 createdBy, lastUpdate, lastUpdateBy, customerId, userId, contactId);
             allAppts.add(appt);
-            for (Contact contact : allContacts) {
-                if (contact.getId() == appt.getContactId()) {
-                    contact.addAppointment(appt);
-                }
-            }
-            for (Customer customer : allCustomers) {
-                if (customer.getId() == appt.getCustomerId()) {
-                    customer.addAppointment(appt);
-                }
-            }
         } else {
             System.out.println("Problem in createAppointment!");
         }
@@ -145,39 +139,8 @@ public class DataHandler {
         prepStmt.setString(14, String.valueOf(id));
         prepStmt.execute();
         
-        final int tempId = id;
-        // Find entry in observable lists, delete them, and add a new one to replace it
         if (id != 0) {
-            allAppts.removeIf(appointment -> appointment.getId() == tempId);
-            Appointment newAppt = new Appointment(id, title, description, location, type, startTime, endTime, createDate,
-                createdBy, lastUpdate, lastUpdateBy, customerId, userId, contactId);
-            allAppts.add(newAppt);
-            // This logic might be iffy, check here if bugs occur
-            for (Contact contact : allContacts) {
-                for (Appointment appt : contact.getAllAppointments()) {
-                    if (appt.getId() == newAppt.getId()) {
-                        contact.deleteAppointment(appt);
-                    }
-                }
-            }
-            for (Customer customer : allCustomers) {
-                for (Appointment appt : customer.getAllAppointments()) {
-                    if (appt.getId() == newAppt.getId()) {
-                        customer.deleteAppointment(appt);
-                    }
-                }
-            }
-            
-            for (Contact contact : allContacts) {
-                if (contact.getId() == newAppt.getContactId()) {
-                    contact.addAppointment(newAppt);
-                }
-            }
-            for (Customer customer : allCustomers) {
-                if (customer.getId() == newAppt.getCustomerId()) {
-                    customer.addAppointment(newAppt);
-                }
-            }
+            DataHandler.setAllAppointments();
         }
     }
     // UNTESTED
@@ -187,29 +150,15 @@ public class DataHandler {
         prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, String.valueOf(id));
         prepStmt.execute();
-        
-        final int tempId = id;
+
         if (id != 0) {
-            allAppts.removeIf(appointment -> appointment.getId() == tempId);
-        }
-        for (Contact contact : allContacts) {
-            for (Appointment appt : contact.getAllAppointments()) {
-                if (appt.getId() == tempId) {
-                    contact.deleteAppointment(appt);
-                }
-            }
-        }
-        for (Customer customer : allCustomers) {
-            for (Appointment appt : customer.getAllAppointments()) {
-                if (appt.getId() == tempId) {
-                    customer.deleteAppointment(appt);
-                }
-            }
+            DataHandler.setAllAppointments();
         }
     }
     
     // UNTESTED
     public static void setAllContacts() throws SQLException {
+        allContacts.clear();
         query = "SELECT * FROM contacts";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
@@ -223,11 +172,6 @@ public class DataHandler {
 
             Contact contact = new Contact(id, name, email);
             allContacts.add(contact);      
-            allAppts.stream().filter((appt) -> {
-                return appt.getContactId() == contact.getId();
-            }).forEachOrdered((appt) -> {
-                contact.addAppointment(appt);
-            });
         }
     }
     // UNTESTED
@@ -276,12 +220,8 @@ public class DataHandler {
         prepStmt.setString(3, String.valueOf(id));
         prepStmt.execute();
 
-        final int tempId = id;
-        // Find entry in observable list, delete it, and add a new one to replace it
         if (id != 0) {
-            allContacts.removeIf(contact -> contact.getId() == tempId);
-            Contact contact = new Contact(id, name, email);
-            allContacts.add(contact);
+            DataHandler.setAllContacts();
         }
     }
     // UNTESTED
@@ -365,6 +305,7 @@ public class DataHandler {
     }
     // UNTESTED
     public static void setAllCustomers() throws SQLException {
+        allCustomers.clear();
         query = "SELECT * FROM customers";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
@@ -386,11 +327,6 @@ public class DataHandler {
             Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
                 createdBy, lastUpdate, lastUpdateBy, divId);
             allCustomers.add(newCust);      
-            allAppts.stream().filter((Appointment appt) -> {
-                return appt.getCustomerId() == newCust.getId();
-            }).forEachOrdered((appt) -> {
-                newCust.addAppointment(appt);
-            });
         }
     }
     // UNTESTED
@@ -457,32 +393,31 @@ public class DataHandler {
         prepStmt.setString(10, String.valueOf(id));
         prepStmt.execute();
 
-        final int tempId = id;
-        // Find entry in observable list, delete it, and add a new one to replace it
         if (id != 0) {
-            allCustomers.removeIf(customer -> customer.getId() == tempId);
-            Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
-                createdBy, lastUpdate, lastUpdateBy, divId);
-            allCustomers.add(newCust);
+            DataHandler.setAllCustomers();
         }
     }
     // UNTESTED
     public static void deleteCustomer(int id) throws SQLException {
+        query = "DELETE FROM appointments WHERE Customer_ID = ?";
+        prepStmt = Query.getPreparedStatement();
+        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.execute();
+        
         query = "DELETE FROM customers WHERE Customer_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, String.valueOf(id));
         prepStmt.execute();
 
-        final int tempId = id;
         if (id != 0) {
-            allCustomers.removeIf(customer -> {
-                return customer.getId() == tempId;
-            });
+            DataHandler.setAllAppointments();
+            DataHandler.setAllCustomers();
         }
     }
     // UNTESTED
     public static void setAllUsers() throws SQLException {
+        allUsers.clear();
         query = "SELECT * FROM users";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
@@ -571,10 +506,35 @@ public class DataHandler {
         prepStmt.setString(1, String.valueOf(id));
         prepStmt.execute();
 
-        final int tempId = id;
         if (id != 0) {
-            allUsers.removeIf(user -> user.getId() == tempId);
+            DataHandler.setAllUsers();
         }
     }
     
+    public static int getNextIdValue(String modelType) throws SQLException {
+        int nextId = 0;
+        if (modelType == "Appointment") {
+            query = "SELECT MAX(Appointment_ID) FROM appointments";
+            Query.setPreparedStatement(connection, query);
+            prepStmt = Query.getPreparedStatement();
+            prepStmt.execute();
+            ResultSet results = prepStmt.getResultSet();
+            
+            while(results.next()) {
+                nextId = results.getInt("MAX(Appointment_ID)") + 1;
+            }
+        } else if (modelType == "Customer") {
+            query = "SELECT MAX(Customer_ID) FROM customers";
+            Query.setPreparedStatement(connection, query);
+            prepStmt = Query.getPreparedStatement();
+            prepStmt.execute();
+            ResultSet results = prepStmt.getResultSet();
+            
+            while(results.next()) {
+                nextId = results.getInt("MAX(Customer_ID)") + 1;
+            }
+        }
+        
+        return nextId;
+    }
 }
