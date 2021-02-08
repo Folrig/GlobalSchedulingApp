@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import utilities.DataHandler;
 
 /**
  * FXML Controller class
@@ -55,6 +56,7 @@ public class LoginController implements Initializable {
             showWrongInfoBox();
         }
         else {
+            DataHandler.currentUser = usernameInput;
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             stage.setTitle("Main Menu");
             scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));

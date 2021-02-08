@@ -7,6 +7,9 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -50,10 +53,10 @@ public class ApptModViewController implements Initializable {
     @FXML private ComboBox<String> startAmPmComboBox;
     @FXML private TextField apptIdTextField;
     @FXML private DatePicker endDatePicker;
-    @FXML private ComboBox<?> endHourComboBox;
-    @FXML private ComboBox<?> endMinuteComboBox;
-    @FXML private ComboBox<?> endAmPmComboBox;
-    @FXML private ComboBox<?> contactComboBox;
+    @FXML private ComboBox<String> endHourComboBox;
+    @FXML private ComboBox<String> endMinuteComboBox;
+    @FXML private ComboBox<String> endAmPmComboBox;
+    @FXML private ComboBox<Contact> contactComboBox;
     @FXML private ComboBox<User> userIdComboBox;
     @FXML private ComboBox<Customer> custIdComboBox;
     @FXML private TextField titleTextField;
@@ -82,14 +85,86 @@ public class ApptModViewController implements Initializable {
     }
 
     @FXML
-    void onModApptButtonClicked(ActionEvent event) {
+    void onModApptButtonClicked(ActionEvent event) throws SQLException, IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Modifying Appointment?");
+        alert.setHeaderText("Confirm Modifying Appointment");
+        alert.setContentText("OK to Confirm" + 
+            "\n" + "Cancel to go back to modifying appointment");
 
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            int id = Integer.parseInt(apptIdTextField.getText());
+            String title = titleTextField.getText();
+            String description = descriptionTextField.getText();
+            String location = locationTextField.getText();
+            String type = typeTextField.getText();
+
+            // Format the date & time inputs into a string
+            // Then parse them to a LocalDateTime
+            String fullDateStr = null;
+            String hourStr = null;
+            String minuteStr = null;
+            
+            if (startAmPmComboBox.getValue().equals("PM") && !startHourComboBox.getValue().equals("12")) {
+                hourStr = String.valueOf(Integer.parseInt(startHourComboBox.getValue()) + 12);
+            } else if (startAmPmComboBox.getValue().equals("AM") && startHourComboBox.getValue().equals("12)")) {
+                hourStr = "0";
+            } else {
+                hourStr = startHourComboBox.getValue();
+            }
+            
+            if (Integer.parseInt(hourStr) < 10) {
+                hourStr = "0" + hourStr;
+            }
+
+            minuteStr = startMinuteComboBox.getValue();
+            DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String startDateStr = startDatePicker.getValue().format(dateFormatter);
+            fullDateStr = startDateStr + " " + hourStr + ":" + minuteStr;
+            LocalDateTime startDate = LocalDateTime.parse(fullDateStr, fullFormatter);
+            
+            String endDateStr = endDatePicker.getValue().format(dateFormatter);
+            if (endAmPmComboBox.getValue().equals("PM") && !endHourComboBox.getValue().equals("12")) {
+                hourStr = String.valueOf(Integer.parseInt(endHourComboBox.getValue()) + 12);
+            } else if (endAmPmComboBox.getValue().equals("AM") && endHourComboBox.getValue().equals("12)")) {
+                hourStr = "0";
+            } else {
+                hourStr = endHourComboBox.getValue();
+            }
+            
+            if (Integer.parseInt(hourStr) < 10) {
+                hourStr = "0" + hourStr;
+            }
+            
+            minuteStr = endMinuteComboBox.getValue();
+            fullDateStr = endDateStr + " " + hourStr + ":" + minuteStr;
+            LocalDateTime endDate = LocalDateTime.parse(fullDateStr, fullFormatter);
+            LocalDateTime updateTime = LocalDateTime.now();
+            String lastUpdateBy = DataHandler.currentUser;
+            int custId = custIdComboBox.getValue().getId();
+            int userId = userIdComboBox.getValue().getId();
+            int contactId = contactComboBox.getValue().getId();
+
+            DataHandler.updateAppointment(id, title, description, location, type, startDate, endDate, updateTime,
+                    lastUpdateBy, custId, userId, contactId);
+            
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            stage.setTitle("Main Menu");
+            scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+            stage.centerOnScreen();
+        }
     }
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Set up all GUI controls with base values
+        // Then display them with the values of the appointment we want to modify
         int contactIndex = 0;
         int custIndex = 0;
         int userIndex = 0;
@@ -112,15 +187,19 @@ public class ApptModViewController implements Initializable {
                 break;
             }
         }
-        
+        minutes.add("00");
         for (int i = 1; i <= 12; i++) {
             hours.add(String.valueOf(i));
             if (i < 12) {
-                minutes.add(String.valueOf(i * 5));
-            } else {
-                minutes.add("00");
+                if (i == 1) {
+                    minutes.add("05");
+                } else {
+                    minutes.add(String.valueOf(i * 5));
+                }
             }
         }
+        meridiem.add("AM");
+        meridiem.add("PM");
         apptIdTextField.setText(Integer.toString(DataHandler.apptToModify.getId()));
         titleTextField.setText(DataHandler.apptToModify.getTitle());
         locationTextField.setText(DataHandler.apptToModify.getLocation());
@@ -134,7 +213,41 @@ public class ApptModViewController implements Initializable {
         custIdComboBox.getSelectionModel().select(custIndex);
         startDatePicker.setValue(DataHandler.apptToModify.getStartTime().toLocalDate());
         startHourComboBox.setItems(hours);
-        
-        // startHourcomboBox.getSelectionModel().select()
+        if (DataHandler.apptToModify.getStartTime().toLocalTime().getHour() > 12) {
+            startHourComboBox.getSelectionModel().select(String.valueOf((DataHandler.apptToModify.getStartTime().toLocalTime().getHour() - 12)));
+        } else {
+            startHourComboBox.getSelectionModel().select(String.valueOf(DataHandler.apptToModify.getStartTime().toLocalTime().getHour()));
+        }
+        startMinuteComboBox.setItems(minutes);
+        String startMinute = String.valueOf(DataHandler.apptToModify.getStartTime().toLocalTime().getMinute());
+        if (startMinute.equals("0") || startMinute.equals("5")) {
+            startMinute = "0" + startMinute;
+        }
+        startMinuteComboBox.getSelectionModel().select(startMinute);
+        startAmPmComboBox.setItems(meridiem);
+        if (DataHandler.apptToModify.getStartTime().toLocalTime().getHour() > 12) {
+            startAmPmComboBox.getSelectionModel().select("PM");
+        } else {
+            startAmPmComboBox.getSelectionModel().select("AM");
+        }
+        endDatePicker.setValue(DataHandler.apptToModify.getEndTime().toLocalDate());
+        endHourComboBox.setItems(hours);
+        if (DataHandler.apptToModify.getEndTime().toLocalTime().getHour() > 12) {
+            endHourComboBox.getSelectionModel().select(String.valueOf((DataHandler.apptToModify.getEndTime().toLocalTime().getHour() - 12)));
+        } else {
+            endHourComboBox.getSelectionModel().select(String.valueOf(DataHandler.apptToModify.getEndTime().toLocalTime().getHour()));
+        }
+        endMinuteComboBox.setItems(minutes);
+        String endMinute = String.valueOf(DataHandler.apptToModify.getEndTime().toLocalTime().getMinute());
+        if (endMinute.equals("0") || endMinute.equals("5")) {
+            endMinute = "0" + endMinute;
+        }
+        endMinuteComboBox.getSelectionModel().select(endMinute);
+        endAmPmComboBox.setItems(meridiem);
+        if (DataHandler.apptToModify.getEndTime().toLocalTime().getHour() > 12) {
+            endAmPmComboBox.getSelectionModel().select("PM");
+        } else {
+            endAmPmComboBox.getSelectionModel().select("AM");
+        }
     }      
 }

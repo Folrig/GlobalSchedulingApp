@@ -80,8 +80,8 @@
                     </rowConstraints>
                      <children>
                         <DatePicker fx:id="startDatePicker" GridPane.columnSpan="3" GridPane.halignment="CENTER" />
-                        <ComboBox fx:id="startHourComboBox" prefWidth="60.0" promptText="10" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="startMinuteComboBox" prefWidth="60.0" promptText="00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="startHourComboBox" prefWidth="65.0" promptText="10" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="startMinuteComboBox" prefWidth="65.0" promptText="00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                         <ComboBox fx:id="startAmPmComboBox" prefWidth="65.0" promptText="AM" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
@@ -146,8 +146,8 @@
                      </rowConstraints>
                      <children>
                         <DatePicker fx:id="endDatePicker" GridPane.columnSpan="3" GridPane.halignment="CENTER" />
-                        <ComboBox fx:id="endHourComboBox" prefWidth="60.0" promptText="10" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="endMinuteComboBox" prefWidth="60.0" promptText="00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="endHourComboBox" prefWidth="65.0" promptText="10" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="endMinuteComboBox" prefWidth="65.0" promptText="00" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                         <ComboBox fx:id="endAmPmComboBox" prefWidth="65.0" promptText="AM" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>

@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
  */
 // POTENTIAL TODO: USERS MIGHT HAVE APPOINTMENTS, MIGHT NOT BE NECESSARY FOR ASSESSMENT!
 public class DataHandler {
+        public static String currentUser = null;
         public static boolean addAppointment = false;
         public static Appointment apptToModify = null;
         public static Customer custToModify = null;
@@ -85,9 +86,9 @@ public class DataHandler {
         prepStmt.setString(8, createdBy);
         prepStmt.setString(9, lastUpdate.toString());
         prepStmt.setString(10, lastUpdateBy);
-        prepStmt.setString(11, String.valueOf(customerId));
-        prepStmt.setString(12, String.valueOf(userId));
-        prepStmt.setString(13, String.valueOf(contactId));
+        prepStmt.setInt(11, customerId);
+        prepStmt.setInt(12, userId);
+        prepStmt.setInt(13, contactId);
         prepStmt.execute();
         
         query = "SELECT Appointment_ID FROM appointments WHERE Title = ? AND Description = ?";
@@ -114,13 +115,13 @@ public class DataHandler {
     }
     // UNTESTED, possible issue with lambda
     public static void updateAppointment(int id, String title, String description, String location, String type, 
-            LocalDateTime startTime, LocalDateTime endTime, LocalDateTime createDate, String createdBy, 
+            LocalDateTime startTime, LocalDateTime endTime,
             LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) throws SQLException {
         
         // Update entry in database
         query = "UPDATE appointments SET Title = ?, Description = ?, Location = ?, Type = ?, Start = ?, " +
-                "End = ?, Create_Date = ?, Created_By = ?, Last_Update = ?, Last_Updated_By = ?, " +
-                "Customer_ID = ?, User_ID = ?, Contact_ID = ?) WHERE Appointment_ID = ?";
+                "End = ?, Last_Update = ?, Last_Updated_By = ?, " +
+                "Customer_ID = ?, User_ID = ?, Contact_ID = ? WHERE Appointment_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, title);
@@ -129,14 +130,13 @@ public class DataHandler {
         prepStmt.setString(4, type);
         prepStmt.setString(5, startTime.toString());
         prepStmt.setString(6, endTime.toString());
-        prepStmt.setString(7, createDate.toString());
-        prepStmt.setString(8, createdBy);
-        prepStmt.setString(9, lastUpdate.toString());
-        prepStmt.setString(10, lastUpdateBy);
-        prepStmt.setString(11, String.valueOf(customerId));
-        prepStmt.setString(12, String.valueOf(userId));
-        prepStmt.setString(13, String.valueOf(contactId));
-        prepStmt.setString(14, String.valueOf(id));
+        prepStmt.setString(7, lastUpdate.toString());
+        prepStmt.setString(8, lastUpdateBy);
+        prepStmt.setInt(9, customerId);
+        prepStmt.setInt(10, userId);
+        prepStmt.setInt(11, contactId);
+        prepStmt.setInt(12, id);
+        System.out.println(prepStmt.toString());
         prepStmt.execute();
         
         if (id != 0) {
@@ -148,7 +148,7 @@ public class DataHandler {
         query = "DELETE FROM appointments WHERE Appointment_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
-        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.setInt(1, id);
         prepStmt.execute();
 
         if (id != 0) {
@@ -217,7 +217,7 @@ public class DataHandler {
         prepStmt = Query.getPreparedStatement();
         prepStmt.setString(1, name);
         prepStmt.setString(2, email);
-        prepStmt.setString(3, String.valueOf(id));
+        prepStmt.setInt(3, id);
         prepStmt.execute();
 
         if (id != 0) {
@@ -229,7 +229,7 @@ public class DataHandler {
         query = "DELETE FROM contacts WHERE Contact_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
-        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.setInt(1, id);
         prepStmt.execute();
 
         final int tempId = id;
@@ -346,7 +346,7 @@ public class DataHandler {
         prepStmt.setString(6, createdBy);
         prepStmt.setString(7, lastUpdate.toString());
         prepStmt.setString(8, lastUpdateBy);
-        prepStmt.setString(9, String.valueOf(divId));
+        prepStmt.setInt(9, divId);
         prepStmt.execute();
 
         query = "SELECT Customer_ID FROM customers WHERE Customer_Name = ? AND Address = ?";
@@ -389,8 +389,8 @@ public class DataHandler {
         prepStmt.setString(6, createdBy);
         prepStmt.setString(7, lastUpdate.toString());
         prepStmt.setString(8, lastUpdateBy);
-        prepStmt.setString(9, String.valueOf(divId));
-        prepStmt.setString(10, String.valueOf(id));
+        prepStmt.setInt(9, divId);
+        prepStmt.setInt(10, id);
         prepStmt.execute();
 
         if (id != 0) {
@@ -401,13 +401,13 @@ public class DataHandler {
     public static void deleteCustomer(int id) throws SQLException {
         query = "DELETE FROM appointments WHERE Customer_ID = ?";
         prepStmt = Query.getPreparedStatement();
-        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.setInt(1, id);
         prepStmt.execute();
         
         query = "DELETE FROM customers WHERE Customer_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
-        prepStmt.setString(1, String.valueOf(id));
+        prepStmt.setInt(1, id);
         prepStmt.execute();
 
         if (id != 0) {
@@ -487,7 +487,7 @@ public class DataHandler {
         prepStmt.setString(4, createdBy);
         prepStmt.setString(5, lastUpdate.toString());
         prepStmt.setString(6, lastUpdateBy);
-        prepStmt.setString(7, String.valueOf(id));
+        prepStmt.setInt(7, id);
         prepStmt.execute();
 
         final int tempId = id;
