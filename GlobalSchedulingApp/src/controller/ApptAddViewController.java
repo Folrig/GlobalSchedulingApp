@@ -39,9 +39,10 @@ import utilities.DataHandler;
  *
  * @author James Spencer
  */
-public class AddApptViewController implements Initializable {
+public class ApptAddViewController implements Initializable {
     Stage stage;
     Parent scene;
+    
     ObservableList<String> hours = FXCollections.observableArrayList();
     ObservableList<String> minutes = FXCollections.observableArrayList();
     ObservableList<String> meridiem = FXCollections.observableArrayList();
@@ -75,7 +76,7 @@ public class AddApptViewController implements Initializable {
             "\n" + "Cancel to go back to modifying appointment");
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
+        if (result.get() == ButtonType.OK) {
             String title = titleTextField.getText();
             String description = descriptionTextField.getText();
             String location = locationTextField.getText();
@@ -177,8 +178,11 @@ public class AddApptViewController implements Initializable {
             meridiem.add("AM");
             meridiem.add("PM");
             contactComboBox.setItems(DataHandler.readContacts());
+            contactComboBox.getSelectionModel().select(0);
             userIdComboBox.setItems(DataHandler.readUsers());
+            userIdComboBox.getSelectionModel().select(0);
             custIdComboBox.setItems(DataHandler.readCustomers());
+            custIdComboBox.getSelectionModel().select(0);
             startDatePicker.setValue(LocalDateTime.now().toLocalDate());
             startHourComboBox.setItems(hours);
             startMinuteComboBox.setItems(minutes);
@@ -188,7 +192,7 @@ public class AddApptViewController implements Initializable {
             endMinuteComboBox.setItems(minutes);
             endAmPmComboBox.setItems(meridiem);
         } catch (SQLException ex) {
-            Logger.getLogger(AddApptViewController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ApptAddViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

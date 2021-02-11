@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustModViewController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustModViewController">
    <children>
       <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1200.0">
          <columnConstraints>
@@ -28,21 +28,21 @@
             <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Button fx:id="addCustButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="140.0" text="Add Customer" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+            <Button fx:id="addCustButton" mnemonicParsing="false" onAction="#onAddCustBtnClicked" prefHeight="60.0" prefWidth="140.0" text="Add Customer" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                <GridPane.margin>
                   <Insets bottom="10.0" />
                </GridPane.margin>
                <font>
                   <Font name="Dubai Bold" size="14.0" />
                </font></Button>
-            <Button fx:id="updateCustButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="140.0" text="Update Customer" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+            <Button fx:id="updateCustButton" mnemonicParsing="false" onAction="#onUpdateCustBtnClicked" prefHeight="60.0" prefWidth="140.0" text="Update Customer" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                <GridPane.margin>
                   <Insets bottom="10.0" />
                </GridPane.margin>
                <font>
                   <Font name="Dubai Bold" size="14.0" />
                </font></Button>
-            <Button fx:id="deleteCustButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="140.0" text="Delete Customer" wrapText="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+            <Button fx:id="deleteCustButton" mnemonicParsing="false" onAction="#onDeleteCustBtnClicked" prefHeight="60.0" prefWidth="140.0" text="Delete Customer" wrapText="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                <GridPane.margin>
                   <Insets bottom="10.0" />
                </GridPane.margin>
@@ -108,7 +108,7 @@
                         <Font name="Dubai Regular" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="custIdTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="custIdTextField" style="-fx-background-color: #e4e4e4;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="addressTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="postalCodeTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Label text="First-level Division:" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
@@ -143,7 +143,7 @@
                         <Insets right="5.0" />
                      </GridPane.margin>
                   </Label>
-                  <ComboBox fx:id="countryComboBox" prefWidth="220.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                  <ComboBox fx:id="countryComboBox" onAction="#onCntryCmbBoxValueChange" prefWidth="220.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                   <ComboBox fx:id="firstLvlDivComboBox" prefWidth="220.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                   <TextField fx:id="custNameTextField" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                   <TextField fx:id="phoneNumTextField" GridPane.columnIndex="5" GridPane.rowIndex="1" />
@@ -157,7 +157,7 @@
                   </Label>
                </children>
             </GridPane>
-            <Button fx:id="backToMainButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="300.0" text="Back To Main" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+            <Button fx:id="backToMainButton" mnemonicParsing="false" onAction="#onBackBtnClicked" prefHeight="60.0" prefWidth="300.0" text="Back To Main" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                <font>
                   <Font name="Dubai Bold" size="24.0" />
                </font>

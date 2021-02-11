@@ -11,8 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="controller.AddCustViewController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustAddViewController">
    <children>
       <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0">
         <columnConstraints>
@@ -50,7 +49,7 @@
                         <Insets right="5.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="custIdTextField" editable="false" GridPane.columnIndex="1" />
+                  <TextField fx:id="custIdTextField" editable="false" style="-fx-background-color: #e4e4e4;" GridPane.columnIndex="1" />
                   <TextField fx:id="addressTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="postalCodeTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Label text="Address:" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
@@ -99,7 +98,7 @@
                         <Insets right="5.0" />
                      </GridPane.margin>
                   </Label>
-                  <ComboBox fx:id="countryComboBox" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ComboBox fx:id="countryComboBox" onAction="#onCntryCmbBoxValueChange" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <GridPane GridPane.columnIndex="2" GridPane.rowIndex="1">
@@ -137,7 +136,7 @@
                   <ComboBox fx:id="firstLvlDivComboBox" prefWidth="225.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
-            <Button fx:id="addCustButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="140.0" text="Add Customer" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+            <Button fx:id="addCustButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onAddCustBtnClicked" prefHeight="50.0" prefWidth="140.0" text="Add Customer" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                <font>
                   <Font name="Dubai Bold" size="18.0" />
                </font>
@@ -145,7 +144,7 @@
                   <Insets left="20.0" />
                </GridPane.margin>
             </Button>
-            <Button fx:id="cancelButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="140.0" text="Cancel" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+            <Button fx:id="cancelButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCancelBtnClicked" prefHeight="50.0" prefWidth="140.0" text="Cancel" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                <font>
                   <Font name="Dubai Bold" size="18.0" />
                </font>

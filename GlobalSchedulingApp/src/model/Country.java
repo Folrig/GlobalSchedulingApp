@@ -90,4 +90,9 @@ public class Country {
     public void addAssociatedDivisions(FirstLevelDivision division) {
         this.associatedDivisions.add(division);
     }
+    
+    @Override
+    public String toString() {
+        return this.getName();
+    }
 }
