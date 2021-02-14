@@ -5,8 +5,9 @@
  */
 package controller;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.time.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -31,6 +32,9 @@ import utilities.DataHandler;
 public class LoginController implements Initializable {
     Stage stage;
     Parent scene;
+    FileWriter fWriter;
+    PrintWriter pWriter;
+    String fileName = "login_activity.txt";
     
     @FXML private Label titleLabel;
     @FXML private Label loginLabel;
@@ -50,13 +54,23 @@ public class LoginController implements Initializable {
 
     @FXML
     void onLoginBtnClicked(ActionEvent event) throws IOException {
+        fWriter = new FileWriter(fileName, true);
+        pWriter = new PrintWriter(fWriter);
         String usernameInput = usernameTextField.getText();
         String passwordInput = passwordTextField.getText();
         if (!usernameInput.equals("test") || !passwordInput.equals("test")) {
+            pWriter.println("** LOGIN ATTEMPT **   Result: INVALID  Date: " + LocalDate.now(ZoneOffset.UTC) +
+                    "  Time: " + LocalTime.now(ZoneOffset.UTC) + "  Username: " + usernameInput + 
+                    "  Password: " + passwordInput);
+            pWriter.close();
             showWrongInfoBox();
         }
         else {
             DataHandler.currentUser = usernameInput;
+            pWriter.println("** LOGIN ATTEMPT **   Result: VALID  Date: " + LocalDate.now(ZoneOffset.UTC) +
+                    "  Time: " + LocalTime.now(ZoneOffset.UTC) + "  Username: " + usernameInput + 
+                    "  Password: " + passwordInput);
+            pWriter.close();
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             stage.setTitle("Main Menu");
             scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));

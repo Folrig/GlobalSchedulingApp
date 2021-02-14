@@ -1,0 +1,3 @@
+** INVALID LOGIN **   Time Stamp: 2021-02-13T17:24:18.664423300  Username: Superman  Password: HelloThere
+*** VALID LOGIN ***   Time Stamp: 2021-02-13T17:24:22.405165400  Username: test  Password: test
+** LOGIN ATTEMPT **   Result: INVALID  Date: 2021-02-14  Time: 01:39:20.533296  Username: John  Password: Simpsons
