@@ -68,7 +68,7 @@ public class CustAddViewController implements Initializable {
             int firstLvlDiv = firstLvlDivComboBox.getValue().getId();
             
             DataHandler.createCustomer(custName, address, postalCode, phoneNum, LocalDateTime.now(),
-                    DataHandler.currentUser, LocalDateTime.now(), DataHandler.currentUser,
+                    DataHandler.currentUser.getName(), LocalDateTime.now(), DataHandler.currentUser.getName(),
                     firstLvlDiv);
             
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();

@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
  */
 // POTENTIAL TODO: USERS MIGHT HAVE APPOINTMENTS, MIGHT NOT BE NECESSARY FOR ASSESSMENT!
 public class DataHandler {
-        public static String currentUser = null;
+        public static User currentUser = null;
         public static boolean addAppointment = false;
         public static Appointment apptToModify = null;
         public static Customer custToModify = null;

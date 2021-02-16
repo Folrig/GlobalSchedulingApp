@@ -8,11 +8,14 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
@@ -161,6 +164,32 @@ public class MainWindowViewController implements Initializable {
         try {
             DataHandler.setAllAppointments();
             populateScheduleTableView();
+            for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()) {
+                if (appt.getUserId() == DataHandler.currentUser.getId() &&
+                        appt.getStartTime().equals(LocalDateTime.now(ZoneOffset.UTC)) &&
+                        appt.getStartTime().minusMinutes(15).isBefore(LocalDateTime.now(ZoneOffset.UTC)) &&
+                        !appt.getStartTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Upcoming Appointments");
+                    alert.setHeaderText("You Have An Appointment Soon");
+                    LocalDate apptDate = appt.getStartTime().toLocalDate();
+                    String formattedDate = apptDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                    String apptTime = appt.getStartTime().toLocalTime().toString();
+                    LocalDateTime tempDateTime = LocalDateTime.parse(apptTime, DateTimeFormatter.ISO_DATE_TIME);
+                    String content = "You have an upcoming appointment with ID number " + appt.getId() +
+                            " on " + formattedDate + " at " + 
+                            tempDateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+                    alert.setContentText(content);
+                    alert.show();
+                    return;
+                }
+            }
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Upcoming Appointments");
+            alert.setHeaderText("No Upcoming Appointments");
+            String content = "You currently have no appointments coming soon";
+            alert.setContentText(content);
+            alert.show();
         } catch (SQLException ex) {
             Logger.getLogger(MainWindowViewController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -10,6 +10,8 @@ import java.net.URL;
 import java.time.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
@@ -22,6 +24,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.Customer;
+import model.User;
 import utilities.DataHandler;
 
 /**
@@ -66,7 +70,12 @@ public class LoginController implements Initializable {
             showWrongInfoBox();
         }
         else {
-            DataHandler.currentUser = usernameInput;
+            for (User user : (ObservableList<User>)DataHandler.readUsers()) {
+                if (usernameInput.equals(user.getName())) {
+                    DataHandler.currentUser = user;
+                    break;
+                }
+            }
             pWriter.println("** LOGIN ATTEMPT **   Result: VALID  Date: " + LocalDate.now(ZoneOffset.UTC) +
                     "  Time: " + LocalTime.now(ZoneOffset.UTC) + "  Username: " + usernameInput + 
                     "  Password: " + passwordInput);

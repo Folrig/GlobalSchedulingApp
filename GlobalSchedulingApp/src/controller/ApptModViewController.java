@@ -142,7 +142,7 @@ public class ApptModViewController implements Initializable {
             fullDateStr = endDateStr + " " + hourStr + ":" + minuteStr;
             LocalDateTime endDate = LocalDateTime.parse(fullDateStr, fullFormatter);
             LocalDateTime updateTime = LocalDateTime.now();
-            String lastUpdateBy = DataHandler.currentUser;
+            String lastUpdateBy = DataHandler.currentUser.getName();
             int custId = custIdComboBox.getValue().getId();
             int userId = userIdComboBox.getValue().getId();
             int contactId = contactComboBox.getValue().getId();

@@ -128,8 +128,8 @@ public class ApptAddViewController implements Initializable {
             int contactId = contactComboBox.getValue().getId();
 
             DataHandler.createAppointment(title, description, location, type, startDate, endDate, 
-                    LocalDateTime.now(), DataHandler.currentUser, LocalDateTime.now(), 
-                    DataHandler.currentUser, custId, userId, contactId);
+                    LocalDateTime.now(), DataHandler.currentUser.getName(), LocalDateTime.now(), 
+                    DataHandler.currentUser.getName(), custId, userId, contactId);
             
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             stage.setTitle("Main Menu");
