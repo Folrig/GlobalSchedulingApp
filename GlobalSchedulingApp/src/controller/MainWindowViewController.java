@@ -70,7 +70,7 @@ public class MainWindowViewController implements Initializable {
         DataHandler.addAppointment = true;
         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
         stage.setTitle("Add Appointment");
-        scene = FXMLLoader.load(getClass().getResource("/view/AddApptView.fxml"));
+        scene = FXMLLoader.load(getClass().getResource("/view/ApptAddView.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
     }

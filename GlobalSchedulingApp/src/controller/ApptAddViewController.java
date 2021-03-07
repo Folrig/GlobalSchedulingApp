@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -51,6 +52,9 @@ public class ApptAddViewController implements Initializable {
     ObservableList<String> minutes = FXCollections.observableArrayList();
     ObservableList<String> meridiem = FXCollections.observableArrayList();
     
+    LocalTime businessOpenTimeUtc = LocalTime.of(13, 0, 0);
+    LocalTime businessCloseTimeUtc = LocalTime.of(6, 0, 0);
+    
     @FXML private Label apptModLabel;
     @FXML private TextField locationTextField;
     @FXML private DatePicker startDatePicker;
@@ -66,7 +70,7 @@ public class ApptAddViewController implements Initializable {
     @FXML private ComboBox<User> userIdComboBox;
     @FXML private ComboBox<Customer> custIdComboBox;
     @FXML private TextField titleTextField;
-    @FXML private TextField typeTextField;
+    @FXML public TextField typeTextField;
     @FXML private TextField descriptionTextField;
     @FXML private Button cancelButton;
     @FXML private Button addApptButton;
@@ -88,9 +92,8 @@ public class ApptAddViewController implements Initializable {
 
             // Format the date & time inputs into a string
             // Then parse them to a LocalDateTime
-            String fullDateStr = null;
-            String hourStr = null;
-            String minuteStr = null;
+            String hourStr = "";
+            String minuteStr = startMinuteComboBox.getValue();
             
             if (startAmPmComboBox.getValue().equals("PM") && !startHourComboBox.getValue().equals("12")) {
                 hourStr = String.valueOf(Integer.parseInt(startHourComboBox.getValue()) + 12);
@@ -104,17 +107,16 @@ public class ApptAddViewController implements Initializable {
                 hourStr = "0" + hourStr;
             }
 
-            minuteStr = startMinuteComboBox.getValue();
             DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String startDateStr = startDatePicker.getValue().format(dateFormatter);
-            fullDateStr = startDateStr + " " + hourStr + ":" + minuteStr;
+            String fullDateStr = startDateStr + " " + hourStr + ":" + minuteStr;
             // Parse the combo boxes to a LocalDateTime
-            LocalDateTime localStartDateLdt = LocalDateTime.parse(fullDateStr, fullFormatter);
+            LocalDateTime startInputLdt = LocalDateTime.parse(fullDateStr, fullFormatter);
             // Find what the inputs would be for the system time zone
-            ZonedDateTime localStartDateZdt = localStartDateLdt.atZone(ZoneId.systemDefault());
+            ZonedDateTime localStartDateZdt = startInputLdt.atZone(ZoneId.systemDefault());
             // Find what the inputs would be in UTC
-            ZonedDateTime UtcStartDateZdt = localStartDateZdt.toLocalDateTime().atZone(ZoneOffset.UTC);
+            ZonedDateTime UtcStartDateZdt = localStartDateZdt.withZoneSameInstant(ZoneId.of("UTC"));
             // Convert the UTC zone date to a LocalDateTime for UTC
             LocalDateTime UtcStartDateLdt = UtcStartDateZdt.toLocalDateTime();
             
@@ -134,11 +136,11 @@ public class ApptAddViewController implements Initializable {
             minuteStr = endMinuteComboBox.getValue();
             fullDateStr = endDateStr + " " + hourStr + ":" + minuteStr;
             // Parse the combo boxes to a LocalDateTime
-            LocalDateTime localEndDateLdt = LocalDateTime.parse(fullDateStr, fullFormatter);
+            LocalDateTime endInputLdt = LocalDateTime.parse(fullDateStr, fullFormatter);
             // Find what the inputs would be for the system time zone
-            ZonedDateTime localEndDateZdt = localEndDateLdt.atZone(ZoneId.systemDefault());
+            ZonedDateTime localEndDateZdt = endInputLdt.atZone(ZoneId.systemDefault());
             // Find what the inputs would be in UTC for comparison
-            ZonedDateTime UtcEndDateZdt = localEndDateZdt.toLocalDateTime().atZone(ZoneOffset.UTC);
+            ZonedDateTime UtcEndDateZdt = localEndDateZdt.withZoneSameInstant(ZoneId.of("UTC"));
             // Convert the UTC zone date to a LocalDateTime for UTC to store
             LocalDateTime UtcEndDateLdt = UtcEndDateZdt.toLocalDateTime();
             int custId = custIdComboBox.getValue().getId();
@@ -149,22 +151,35 @@ public class ApptAddViewController implements Initializable {
             for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()) {
                 // Check if customer already has any appointments
                 if (appt.getCustomerId() == custId) {
-                    // Check if the appointment is overlapping
-                    if (appt.getStartTime().isBefore(UtcEndDateLdt) ||
-                        appt.getEndTime().isAfter(UtcStartDateLdt)) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Invalid Time");
-                        alert.setHeaderText("Customer already has an appointment during this time period.");
-                        alert.showAndWait();
-                        return;
-                        
-                    // Check if the appointment is before business hours
-                    } else if (UtcStartDateZdt.getHour() > 13) {
-                        return;
-                        
-                    // Check if the appointment is after business hours
-                    } else if (UtcEndDateLdt.getHour() < 3) {
-                        return;
+                    // Check if appointment dates are the same
+                    if (appt.getStartTime().toLocalDate().equals(UtcStartDateLdt.toLocalDate())) {
+                        // Check if the appointment times are overlapping
+                        if (appt.getStartTime().toLocalTime().isBefore(UtcEndDateLdt.toLocalTime()) ||
+                            appt.getEndTime().toLocalTime().isAfter(UtcStartDateLdt.toLocalTime())) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Invalid Time");
+                            alert.setHeaderText("Customer already has an appointment during this time period");
+                            alert.showAndWait();
+                            return;
+
+                        // Check if the appointment is before business hours
+                        } else if (UtcStartDateLdt.toLocalTime().isBefore(businessOpenTimeUtc)) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Invalid Time");
+                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                    "The proposed appointment begins before opening business hours");
+                            alert.showAndWait();
+                            return;
+
+                        // Check if the appointment is after business hours
+                        } else if (UtcEndDateLdt.toLocalTime().isAfter(businessCloseTimeUtc)) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Invalid Time");
+                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                    "The proposed appointment ends after closing business hours");
+                            alert.showAndWait();
+                            return;
+                        }
                     }
                 }
             }
@@ -228,12 +243,18 @@ public class ApptAddViewController implements Initializable {
             custIdComboBox.getSelectionModel().select(0);
             startDatePicker.setValue(LocalDateTime.now().toLocalDate());
             startHourComboBox.setItems(hours);
+            startHourComboBox.getSelectionModel().select(11); // Set default start hour to 10
             startMinuteComboBox.setItems(minutes);
+            startMinuteComboBox.getSelectionModel().select(0); // Set default minutes to 00
             startAmPmComboBox.setItems(meridiem);
+            startAmPmComboBox.getSelectionModel().select(0); // Set default start meridiem to AM
             endDatePicker.setValue(LocalDateTime.now().toLocalDate());
             endHourComboBox.setItems(hours);
+            endHourComboBox.getSelectionModel().select(11); // Set default end hour to 10
             endMinuteComboBox.setItems(minutes);
+            endMinuteComboBox.getSelectionModel().select(0); // Set default end minutes to 00
             endAmPmComboBox.setItems(meridiem);
+            endAmPmComboBox.getSelectionModel().select(0); // Set default end meridiem to AM
         } catch (SQLException ex) {
             Logger.getLogger(ApptAddViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
