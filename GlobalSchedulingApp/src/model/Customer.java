@@ -25,9 +25,13 @@ public class Customer {
     private LocalDateTime lastUpdate;
     private String lastUpdateBy;
     private int divisionId;
+//    private Country country;
+//    private FirstLevelDivision firstLvlDiv;
     private ObservableList<Appointment> appointments = FXCollections.observableArrayList();
     
-    public Customer(int id, String name, String address, String postalCode, String phoneNum, LocalDateTime createDate, String createBy, LocalDateTime lastUpdate, String lastUpdateBy, int divisionId) {
+    public Customer(int id, String name, String address, String postalCode, String phoneNum,
+            LocalDateTime createDate, String createBy, LocalDateTime lastUpdate, String lastUpdateBy,
+            int divisionId) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -38,6 +42,8 @@ public class Customer {
         this.lastUpdate = lastUpdate;
         this.lastUpdateBy = lastUpdateBy;
         this.divisionId = divisionId;
+//        this.country = country;
+//        this.firstLvlDiv = firstLvlDiv;
     }
 
     public int getId() {
@@ -119,6 +125,22 @@ public class Customer {
     public void setDivisionId(int divisionId) {
         this.divisionId = divisionId;
     }
+    
+//    public Country getCountry() {
+//        return country;
+//    }
+//
+//    public void setCountry(Country country) {
+//        this.country = country;
+//    }
+//
+//    public FirstLevelDivision getFirstLvlDiv() {
+//        return firstLvlDiv;
+//    }
+//
+//    public void setFirstLvlDiv(FirstLevelDivision firstLvlDiv) {
+//        this.firstLvlDiv = firstLvlDiv;
+//    }
 
     public ObservableList<Appointment> getAppointments() {
         return appointments;

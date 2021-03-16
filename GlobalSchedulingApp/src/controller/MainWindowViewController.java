@@ -165,10 +165,23 @@ public class MainWindowViewController implements Initializable {
             DataHandler.setAllAppointments();
             populateScheduleTableView();
             for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()) {
+                ZonedDateTime apptStartTimeZdt = appt.getStartTime().atZone(ZoneId.systemDefault());
+                ZonedDateTime apptUtcStartTimeZdt = apptStartTimeZdt.withZoneSameInstant(ZoneId.of("UTC"));
+                LocalDateTime apptUtcStartTimeLdt = apptUtcStartTimeZdt.toLocalDateTime();
+                
+                System.out.println(appt.getUserId() + "  " + DataHandler.currentUser.getId());
+                System.out.println(apptUtcStartTimeLdt.toLocalDate() + "  " + LocalDate.now(ZoneOffset.UTC));
+                System.out.println(appt.getStartTime().toLocalDate() + "  " + LocalDate.now(ZoneOffset.UTC));
+                
+                System.out.println(apptUtcStartTimeLdt.toLocalTime().minusMinutes(15) + "  " + LocalTime.now(ZoneOffset.UTC));
+                System.out.println(appt.getStartTime().toLocalTime().minusMinutes(15) + "  " + LocalTime.now(ZoneOffset.UTC));
+                
+                System.out.println(apptUtcStartTimeLdt.toLocalTime() + "  " + LocalTime.now(ZoneOffset.UTC));
+                System.out.println(appt.getStartTime().toLocalTime() + "  " + LocalTime.now(ZoneOffset.UTC));
                 if (appt.getUserId() == DataHandler.currentUser.getId() &&
-                        appt.getStartTime().equals(LocalDateTime.now(ZoneOffset.UTC)) &&
-                        appt.getStartTime().minusMinutes(15).isBefore(LocalDateTime.now(ZoneOffset.UTC)) &&
-                        !appt.getStartTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                        apptUtcStartTimeLdt.toLocalDate().equals(LocalDate.now(ZoneOffset.UTC)) &&
+                        apptUtcStartTimeLdt.toLocalTime().minusMinutes(15).isBefore(LocalTime.now(ZoneOffset.UTC)) &&
+                        !apptUtcStartTimeLdt.toLocalTime().isBefore(LocalTime.now(ZoneOffset.UTC))) {
                     Alert alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Upcoming Appointments");
                     alert.setHeaderText("You Have An Appointment Soon");
@@ -177,8 +190,8 @@ public class MainWindowViewController implements Initializable {
                     String apptTime = appt.getStartTime().toLocalTime().toString();
                     LocalDateTime tempDateTime = LocalDateTime.parse(apptTime, DateTimeFormatter.ISO_DATE_TIME);
                     String content = "You have an upcoming appointment with ID number " + appt.getId() +
-                            " on " + formattedDate + " at " + 
-                            tempDateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+                            " on " + formattedDate + " at " + apptTime;
+                            // tempTime.format(DateTimeFormatter.ofPattern("HH:mm"));
                     alert.setContentText(content);
                     alert.show();
                     return;

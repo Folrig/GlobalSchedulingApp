@@ -50,6 +50,8 @@ public class LoginController implements Initializable {
     @FXML private Label locationLabel;
     @FXML private Button loginBtn;
     @FXML private Button exitBtn;
+    @FXML private Label zoneLabel;
+    @FXML private Label currentZoneIdLabel;
     
     @FXML
     void onExitBtnClicked(ActionEvent event) {
@@ -81,7 +83,11 @@ public class LoginController implements Initializable {
                     "  Password: " + passwordInput);
             pWriter.close();
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            stage.setTitle("Main Menu");
+            if (Locale.getDefault().getLanguage().equals("fr")){
+                stage.setTitle(DataHandler.rb.getString("menu") + " " + DataHandler.rb.getString("main"));
+            } else {
+                stage.setTitle("Main Menu");
+            }
             scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
             stage.setScene(new Scene(scene));
             stage.show();
@@ -91,8 +97,16 @@ public class LoginController implements Initializable {
     
     private void showWrongInfoBox (){
         Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle("Incorrect Username Or Password");
-        alert.setHeaderText("The username or password you used was incorrect.");
+        if (Locale.getDefault().getLanguage().equals("fr")){
+            alert.setTitle(DataHandler.rb.getString("incorrect") + " " + DataHandler.rb.getString("username") +
+                    " " + DataHandler.rb.getString("or") + " " + DataHandler.rb.getString("password"));
+            alert.setHeaderText(DataHandler.rb.getString("the") + " " + DataHandler.rb.getString("username") +
+                    " " + DataHandler.rb.getString("or") + " " + DataHandler.rb.getString("password") +
+                    " " + DataHandler.rb.getString("is") + " " + DataHandler.rb.getString("incorrect"));
+        } else {
+            alert.setTitle("Incorrect Username Or Password");
+            alert.setHeaderText("The username or password is incorrect.");
+        }
         alert.showAndWait();
     }
     /**
@@ -102,16 +116,23 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        DataHandler.currentZoneId = ZoneId.systemDefault();
         Locale locale = Locale.getDefault();
         if (locale.toString().contains("en")) {
-            // SET LANGAUGE PACK HERE AND ALL LABELS HERE
-            // BELOW IS JUST A TEST
             currentLocationLabel.setText("United States");
+            currentZoneIdLabel.setText(DataHandler.currentZoneId.toString());
         }
-        if (locale.toString().contains("fr")) {
-            // SET LANGUAGE PACK AND ALL LABELS HERE
-            // BELOW IS JUST A TEST
-            currentLocationLabel.setText("France");
+        if (Locale.getDefault().getLanguage().equals("fr")) {
+            titleLabel.setText(DataHandler.rb.getString("global") + " " + DataHandler.rb.getString("scheduling"));
+            loginLabel.setText(DataHandler.rb.getString("login"));
+            usernameLabel.setText(DataHandler.rb.getString("username"));
+            passwordLabel.setText(DataHandler.rb.getString("password"));
+            loginBtn.setText(DataHandler.rb.getString("login"));
+            exitBtn.setText(DataHandler.rb.getString("exit"));
+            locationLabel.setText(DataHandler.rb.getString("current") + " " + DataHandler.rb.getString("location") + ":");
+            currentLocationLabel.setText("La France");
+            zoneLabel.setText(DataHandler.rb.getString("current") + " " + DataHandler.rb.getString("zone") + ":");
+            currentZoneIdLabel.setText(DataHandler.currentZoneId.toString());
         }
     }    
 }

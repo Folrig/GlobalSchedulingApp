@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import utilities.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import utilities.DataHandler;
 
 /**
@@ -33,7 +35,10 @@ public class GlobalSchedulingApp extends Application{
      * @param args the command line arguments
      */
     public static void main(String[] args) throws SQLException {
-     
+
+        if (Locale.getDefault().toString().contains("fr")) {
+            DataHandler.rb = ResourceBundle.getBundle("resources/Nat", Locale.getDefault());
+        }
         Connection conn = DatabaseConnection.connectionInit();
         DataHandler.connection = conn;
         DataHandler.setAllCountries();

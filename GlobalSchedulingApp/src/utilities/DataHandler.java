@@ -15,7 +15,9 @@ import model.FirstLevelDivision;
 import model.User;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -37,6 +39,8 @@ public class DataHandler {
         public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         private static String query;
         private static PreparedStatement prepStmt;
+        public static ZoneId currentZoneId;
+        public static ResourceBundle rb;
         
         
     public static void setAllAppointments() throws SQLException {
@@ -261,6 +265,7 @@ public class DataHandler {
                 int countryId = results.getInt("COUNTRY_ID");                
                 FirstLevelDivision div = new FirstLevelDivision(divId, name, createDate, createdBy,
                     lastUpdate, lastUpdateBy, countryId);
+                allFirstLvlDivs.add(div);
                 if (countryId == 1) {
                     usaDivList.add(div);
                 } else if (countryId == 2) {
@@ -323,7 +328,7 @@ public class DataHandler {
             LocalDateTime lastUpdate = results.getTimestamp("Last_Update").toLocalDateTime();
             String lastUpdateBy = results.getString("Last_Updated_By");
             int divId = results.getInt("Division_ID");
-
+            
             Customer newCust = new Customer(id, name, address, postalCode, phoneNum, createDate,
                 createdBy, lastUpdate, lastUpdateBy, divId);
             allCustomers.add(newCust);      
@@ -372,12 +377,12 @@ public class DataHandler {
         return allCustomers;
     }
     // UNTESTED
-    public static void updateCustomer(int id, String name, String address, String postalCode, String phoneNum,
-            LocalDateTime createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy,
+    public static void updateCustomer(int id, String name, String address, String postalCode,
+            String phoneNum, LocalDateTime lastUpdate, String lastUpdateBy,
             int divId) throws SQLException {
         // Update entry in database
-        query = "UPDATE customers SET Customer_Name = ?, Address = ?, Postal_Code = ?, Phone = ?, " +
-                "Create_Date = ?, Created_By = ?, Last_Update = ?, Last_Updated_By = ?, Division_ID = ? " +
+        query = "UPDATE customers SET Customer_Name = ?, Address = ?, Postal_Code = ?, " +
+                "Phone = ?, Last_Update = ?, Last_Updated_By = ?, Division_ID = ? " +
                 "WHERE Customer_ID = ?";
         Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
@@ -385,12 +390,10 @@ public class DataHandler {
         prepStmt.setString(2, address);
         prepStmt.setString(3, postalCode);
         prepStmt.setString(4, phoneNum);
-        prepStmt.setString(5, createDate.toString());
-        prepStmt.setString(6, createdBy);
-        prepStmt.setString(7, lastUpdate.toString());
-        prepStmt.setString(8, lastUpdateBy);
-        prepStmt.setInt(9, divId);
-        prepStmt.setInt(10, id);
+        prepStmt.setString(5, lastUpdate.toString());
+        prepStmt.setString(6, lastUpdateBy);
+        prepStmt.setInt(7, divId);
+        prepStmt.setInt(8, id);
         prepStmt.execute();
 
         if (id != 0) {
@@ -400,6 +403,7 @@ public class DataHandler {
     // UNTESTED
     public static void deleteCustomer(int id) throws SQLException {
         query = "DELETE FROM appointments WHERE Customer_ID = ?";
+        Query.setPreparedStatement(connection, query);
         prepStmt = Query.getPreparedStatement();
         prepStmt.setInt(1, id);
         prepStmt.execute();

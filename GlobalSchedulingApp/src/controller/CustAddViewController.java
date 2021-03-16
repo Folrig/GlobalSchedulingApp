@@ -22,6 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -67,16 +68,28 @@ public class CustAddViewController implements Initializable {
             String phoneNum = phoneNumTextField.getText();
             int firstLvlDiv = firstLvlDivComboBox.getValue().getId();
             
-            DataHandler.createCustomer(custName, address, postalCode, phoneNum, LocalDateTime.now(),
-                    DataHandler.currentUser.getName(), LocalDateTime.now(), DataHandler.currentUser.getName(),
-                    firstLvlDiv);
-            
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            stage.setTitle("Main Menu");
-            scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-            stage.centerOnScreen();
+            if (!address.contains(" ") || !address.contains(",")) {
+                Alert warning = new Alert(AlertType.WARNING);
+                warning.setTitle("Incorrect Address Format");
+                warning.setHeaderText("Address Format Is Incorrect");
+                warning.setContentText("Addresses must be in one of the following formats:\n\n" +
+                        "US: 123 ABC Street, White Plains\n" +
+                        "Canadian: 123 ABC Street, Newmarket\n" +
+                        "UK: 123 ABC Street, Greenwich, London");
+
+                warning.showAndWait();
+            } else {
+                DataHandler.createCustomer(custName, address, postalCode, phoneNum, LocalDateTime.now(),
+                        DataHandler.currentUser.getName(), LocalDateTime.now(), DataHandler.currentUser.getName(),
+                        firstLvlDiv);
+
+                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                stage.setTitle("Main Menu");
+                scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
+                stage.centerOnScreen();
+            }
         }
     }
 

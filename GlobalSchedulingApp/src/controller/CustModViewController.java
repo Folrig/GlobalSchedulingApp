@@ -7,8 +7,14 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
@@ -22,9 +28,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.Country;
+import model.Customer;
 import model.FirstLevelDivision;
+import utilities.DataHandler;
 
 /**
  * FXML Controller class
@@ -34,22 +44,23 @@ import model.FirstLevelDivision;
 public class CustModViewController implements Initializable {
     Stage stage;
     Parent scene;
+    ObservableList<Country> countries = FXCollections.observableArrayList();
     
     @FXML private Button addCustButton;
     @FXML private Button updateCustButton;
     @FXML private Button deleteCustButton;
-    @FXML private TableView<?> custInfoTableView;
-    @FXML private TableColumn<?, ?> custIdColumn;
-    @FXML private TableColumn<?, ?> custNameColumn;
-    @FXML private TableColumn<?, ?> addressColumn;
-    @FXML private TableColumn<?, ?> postalCodeColumn;
-    @FXML private TableColumn<?, ?> frstLvlDivColumn;
-    @FXML private TableColumn<?, ?> countryColumn;
-    @FXML private TableColumn<?, ?> phoneColumn;
-    @FXML private TableColumn<?, ?> createDateColumn;
-    @FXML private TableColumn<?, ?> createByColumn;
-    @FXML private TableColumn<?, ?> lastUpdateColumn;
-    @FXML private TableColumn<?, ?> lastUpdateByColumn;
+    @FXML private TableView<Customer> custInfoTableView;
+    @FXML private TableColumn<Customer, Integer> custIdColumn;
+    @FXML private TableColumn<Customer, String> custNameColumn;
+    @FXML private TableColumn<Customer, String> addressColumn;
+    @FXML private TableColumn<Customer, Integer> postalCodeColumn;
+    @FXML private TableColumn<Customer, String> frstLvlDivColumn;
+    @FXML private TableColumn<Customer, String> countryColumn;
+    @FXML private TableColumn<Customer, String> phoneColumn;
+    @FXML private TableColumn<Customer, String> createDateColumn;
+    @FXML private TableColumn<Customer, String> createByColumn;
+    @FXML private TableColumn<Customer, LocalDateTime> lastUpdateColumn;
+    @FXML private TableColumn<Customer, String> lastUpdateByColumn;
     @FXML private TextField custIdTextField;
     @FXML private TextField addressTextField;
     @FXML private TextField postalCodeTextField;
@@ -95,17 +106,16 @@ public class CustModViewController implements Initializable {
     }
 
     @FXML
-    void onDeleteCustBtnClicked(ActionEvent event) throws IOException {
+    void onDeleteCustBtnClicked(ActionEvent event) throws IOException, SQLException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Delete Customer?");
-        alert.setHeaderText("Delete this customer?");
+        alert.setHeaderText("Delete customer " + custNameTextField.getText() + "?");
         alert.setContentText("OK to delete customer" + 
             "\n" + "Cancel to go back to modifying customer");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
-            // delete customer
-            
+            DataHandler.deleteCustomer(Integer.valueOf(custIdTextField.getText()));
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             stage.setTitle("Main Menu");
             scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
@@ -116,7 +126,7 @@ public class CustModViewController implements Initializable {
     }
 
     @FXML
-    void onUpdateCustBtnClicked(ActionEvent event) throws IOException {
+    void onUpdateCustBtnClicked(ActionEvent event) throws IOException, SQLException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Modifying Customer?");
         alert.setHeaderText("Return to main menu?");
@@ -124,18 +134,75 @@ public class CustModViewController implements Initializable {
             "\n" + "Cancel to go back to modifying customer");
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            // update customer
+        if (result.get() == ButtonType.OK) {
+            int id = Integer.valueOf(custIdTextField.getText());
+            String custName = custNameTextField.getText();
+            String address = addressTextField.getText();
+            String postalCode = postalCodeTextField.getText();
+            String phoneNum = phoneNumTextField.getText();
+            int firstLvlDiv = firstLvlDivComboBox.getValue().getId();
             
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            stage.setTitle("Main Menu");
-            scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-            stage.centerOnScreen();
+            if (!address.contains(" ") && !address.contains(",")) {
+                Alert warning = new Alert(Alert.AlertType.WARNING);
+                warning.setTitle("Incorrect Address Format");
+                warning.setHeaderText("Address Format Is Incorrect");
+                warning.setContentText("Addresses must be in one of the following formats:\n\n" +
+                        "US: 123 ABC Street, White Plains\n" +
+                        "Canadian: 123 ABC Street, Newmarket\n" +
+                        "UK: 123 ABC Street, Greenwich, London");
+
+                warning.showAndWait();
+            } else {
+                DataHandler.updateCustomer(id, custName, address, postalCode, phoneNum,
+                        LocalDateTime.now(), DataHandler.currentUser.getName(), firstLvlDiv);
+
+                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                stage.setTitle("Main Menu");
+                scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
+                stage.centerOnScreen();
+            }
         }
     }
     
+    @FXML
+    void onRowClicked(MouseEvent event) {
+        Customer cust = custInfoTableView.getSelectionModel().getSelectedItem();
+        custIdTextField.setText(Integer.toString(cust.getId()));
+        addressTextField.setText(cust.getAddress());
+        postalCodeTextField.setText(cust.getPostalCode());
+        custNameTextField.setText(cust.getName());
+        phoneNumTextField.setText(cust.getPhoneNum());
+        
+        divisionLoop:
+        for (FirstLevelDivision firstLvlDiv : DataHandler.allFirstLvlDivs) {
+            if (firstLvlDiv.getId() == cust.getDivisionId()) {
+                for (Country country : DataHandler.allCountries) {
+                    if (country.getId() == firstLvlDiv.getCountryId()) {
+                        countryComboBox.getSelectionModel().select(country);
+                        firstLvlDivComboBox.setItems(country.getAllAssociatedDivisions());
+                        firstLvlDivComboBox.getSelectionModel().select(firstLvlDiv);
+                        break divisionLoop;
+                    }
+                }
+            }
+        }
+    }
+    
+    private void populateCustomerTableView() {
+        custInfoTableView.setItems(DataHandler.readCustomers());
+        custIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        custNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+        postalCodeColumn.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        frstLvlDivColumn.setCellValueFactory(new PropertyValueFactory<>("divisionId"));
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNum"));
+        createDateColumn.setCellValueFactory(new PropertyValueFactory<>("createDate"));
+        createByColumn.setCellValueFactory(new PropertyValueFactory<>("createBy"));
+        lastUpdateColumn.setCellValueFactory(new PropertyValueFactory<>("lastUpdate"));
+        lastUpdateByColumn.setCellValueFactory(new PropertyValueFactory<>("lastUpdateBy"));
+    }
     /**
      * Initializes the controller class.
      * @param url
@@ -143,7 +210,18 @@ public class CustModViewController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // Set up all GUI controls with base values
+        try {
+            DataHandler.setAllCustomers();
+            countries = DataHandler.readCountries();
+            populateCustomerTableView();
+            countryComboBox.setItems(DataHandler.readCountries());
+            countryComboBox.getSelectionModel().select(0);
+            firstLvlDivComboBox.setItems(countries.get(0).getAllAssociatedDivisions());
+            firstLvlDivComboBox.getSelectionModel().select(0);
+        } catch (SQLException ex) {
+            Logger.getLogger(ApptAddViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }    
     
 }
