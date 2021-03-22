@@ -11,10 +11,16 @@ import java.sql.SQLException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -58,9 +64,10 @@ public class MainWindowViewController implements Initializable {
     @FXML private Button updateApptButton;
     @FXML private Button custAudButton;
     @FXML private Button deleteApptButton;
+    @FXML private RadioButton allApptViewRadioBtn;
     @FXML private RadioButton weeklyViewRadioButton;
-    @FXML private ToggleGroup viewRadioToggleGroup;
     @FXML private RadioButton monthlyViewRadioButton;
+    @FXML private ToggleGroup viewRadioToggleGroup;
     @FXML private Button reportOneButton;
     @FXML private Button reportTwoButton;
     @FXML private Button reportThreeButton;
@@ -105,7 +112,7 @@ public class MainWindowViewController implements Initializable {
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Okay To Delete?");
             alert.setHeaderText("Deleting Appointment #" + String.valueOf(apptToDelete.getId()) +
-                    "\n" + apptToDelete.getType());
+                    "\nType Of Appointment: " + apptToDelete.getType());
             alert.setContentText("Click OK to confirm deletion or cancel to go back.");
 
             Optional<ButtonType> result = alert.showAndWait();
@@ -130,15 +137,59 @@ public class MainWindowViewController implements Initializable {
     void onReportThreeBtnClicked(ActionEvent event) {
 
     }
-
+    
+    @FXML
+    void onAllApptRadioBtnTog(ActionEvent event) {
+        populateScheduleTableView();
+    }
+    
     @FXML
     void onMonthlyRdoBtnTog(ActionEvent event) {
-
+        ObservableList<Appointment> monthlyAppointments = FXCollections.observableArrayList();
+        for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()){
+            if (appt.getStartTime().getMonth().equals(LocalDateTime.now().getMonth())) {
+                monthlyAppointments.add(appt);
+            }
+        }
+        scheduleTableView.setItems(monthlyAppointments);
+        apptIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        contactColumn.setCellValueFactory(new PropertyValueFactory<>("contactId"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        custIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
     }
     
     @FXML
     void onWeeklyRadioBtnTog(ActionEvent event) {
-
+        ObservableList<Appointment> weeklyAppointments = FXCollections.observableArrayList();
+ 
+        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+        DayOfWeek lastDayOfWeek = DayOfWeek.of(((firstDayOfWeek.getValue() + 5) % DayOfWeek.values().length) + 1);
+        
+        LocalDate startOfWeek = LocalDate.now(ZoneId.systemDefault()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+        LocalDate endOfWeek = LocalDate.now(ZoneId.systemDefault()).with(TemporalAdjusters.nextOrSame(lastDayOfWeek));
+        
+        
+        for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()){
+            if ((appt.getStartTime().toLocalDate().isEqual(startOfWeek) || appt.getStartTime().toLocalDate().isAfter(startOfWeek)) &&
+                    (appt.getEndTime().toLocalDate().isEqual(endOfWeek) || appt.getEndTime().toLocalDate().isBefore(endOfWeek))){
+                weeklyAppointments.add(appt);
+            }
+        }
+        scheduleTableView.setItems(weeklyAppointments);
+        apptIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        contactColumn.setCellValueFactory(new PropertyValueFactory<>("contactId"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        custIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
     }
     
     private void populateScheduleTableView() {
@@ -169,15 +220,6 @@ public class MainWindowViewController implements Initializable {
                 ZonedDateTime apptUtcStartTimeZdt = apptStartTimeZdt.withZoneSameInstant(ZoneId.of("UTC"));
                 LocalDateTime apptUtcStartTimeLdt = apptUtcStartTimeZdt.toLocalDateTime();
                 
-                System.out.println(appt.getUserId() + "  " + DataHandler.currentUser.getId());
-                System.out.println(apptUtcStartTimeLdt.toLocalDate() + "  " + LocalDate.now(ZoneOffset.UTC));
-                System.out.println(appt.getStartTime().toLocalDate() + "  " + LocalDate.now(ZoneOffset.UTC));
-                
-                System.out.println(apptUtcStartTimeLdt.toLocalTime().minusMinutes(15) + "  " + LocalTime.now(ZoneOffset.UTC));
-                System.out.println(appt.getStartTime().toLocalTime().minusMinutes(15) + "  " + LocalTime.now(ZoneOffset.UTC));
-                
-                System.out.println(apptUtcStartTimeLdt.toLocalTime() + "  " + LocalTime.now(ZoneOffset.UTC));
-                System.out.println(appt.getStartTime().toLocalTime() + "  " + LocalTime.now(ZoneOffset.UTC));
                 if (appt.getUserId() == DataHandler.currentUser.getId() &&
                         apptUtcStartTimeLdt.toLocalDate().equals(LocalDate.now(ZoneOffset.UTC)) &&
                         apptUtcStartTimeLdt.toLocalTime().minusMinutes(15).isBefore(LocalTime.now(ZoneOffset.UTC)) &&

@@ -52,8 +52,8 @@ public class ApptAddViewController implements Initializable {
     ObservableList<String> minutes = FXCollections.observableArrayList();
     ObservableList<String> meridiem = FXCollections.observableArrayList();
     
-    LocalTime businessOpenTimeUtc = LocalTime.of(13, 0, 0);
-    LocalTime businessCloseTimeUtc = LocalTime.of(6, 0, 0);
+    ZonedDateTime businessOpenTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(8,0), ZoneId.of("America/New_York"));
+    ZonedDateTime businessCloseTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(22, 0), ZoneId.of("America/New_York"));
     
     @FXML private Label apptModLabel;
     @FXML private TextField locationTextField;
@@ -74,6 +74,25 @@ public class ApptAddViewController implements Initializable {
     @FXML private TextField descriptionTextField;
     @FXML private Button cancelButton;
     @FXML private Button addApptButton;
+    
+    @FXML
+    void onCancelButtonClicked(ActionEvent event) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cancel Adding Appointment?");
+        alert.setHeaderText("Return to main menu?");
+        alert.setContentText("OK to return to main menu" + 
+            "\n" + "Cancel to go back to adding appointment");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            stage.setTitle("Main Menu");
+            scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+            stage.centerOnScreen();
+        }
+    }
     
     @FXML
     void onAddApptButtonClicked(ActionEvent event) throws SQLException, IOException {
@@ -147,6 +166,21 @@ public class ApptAddViewController implements Initializable {
             int userId = userIdComboBox.getValue().getId();
             int contactId = contactComboBox.getValue().getId();
             
+            // Make sure end time is after start time and start time is before end time
+            if (UtcEndDateLdt.isBefore(UtcStartDateLdt)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Time");
+                alert.setHeaderText("Appointment end time must be after start time");
+                alert.showAndWait();
+                return;
+            } else if (UtcStartDateLdt.isAfter(UtcEndDateLdt)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Time");
+                alert.setHeaderText("Appointment start time must be before end time");
+                alert.showAndWait();
+                return;
+            }
+            
             // Loop through appointments to ensure there are no conflicts
             for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()) {
                 // Check if customer already has any appointments
@@ -161,25 +195,25 @@ public class ApptAddViewController implements Initializable {
                             alert.setHeaderText("Customer already has an appointment during this time period");
                             alert.showAndWait();
                             return;
-
-                        // Check if the appointment is before business hours
-                        } else if (UtcStartDateLdt.toLocalTime().isBefore(businessOpenTimeUtc)) {
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setTitle("Invalid Time");
-                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
-                                    "The proposed appointment begins before opening business hours");
-                            alert.showAndWait();
-                            return;
-
-                        // Check if the appointment is after business hours
-                        } else if (UtcEndDateLdt.toLocalTime().isAfter(businessCloseTimeUtc)) {
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setTitle("Invalid Time");
-                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
-                                    "The proposed appointment ends after closing business hours");
-                            alert.showAndWait();
-                            return;
                         }
+                    }
+                    // Check if the appointment is before business hours
+                    if (UtcStartDateZdt.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalTime().isBefore(businessOpenTimeUtc.toLocalTime())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Invalid Time");
+                        alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                "The proposed appointment begins before opening business hours");
+                        alert.showAndWait();
+                        return;
+
+                    // Check if the appointment is after business hours
+                    } else if (UtcEndDateZdt.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalTime().isAfter(businessCloseTimeUtc.toLocalTime())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Invalid Time");
+                        alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                "The proposed appointment ends after closing business hours");
+                        alert.showAndWait();
+                        return;
                     }
                 }
             }
@@ -197,26 +231,7 @@ public class ApptAddViewController implements Initializable {
             stage.centerOnScreen();
         }
     }
-    
-    @FXML
-    void onCancelButtonClicked(ActionEvent event) throws IOException {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Cancel Adding Appointment?");
-        alert.setHeaderText("Return to main menu?");
-        alert.setContentText("OK to return to main menu" + 
-            "\n" + "Cancel to go back to adding appointment");
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            stage.setTitle("Main Menu");
-            scene = FXMLLoader.load(getClass().getResource("/view/MainWindowView.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-            stage.centerOnScreen();
-        }
-    }
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Set up all GUI controls with base values

@@ -8,6 +8,7 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -51,8 +52,8 @@ public class ApptModViewController implements Initializable {
     ObservableList<String> minutes = FXCollections.observableArrayList();
     ObservableList<String> meridiem = FXCollections.observableArrayList();
     
-    LocalTime businessOpenTimeUtc = LocalTime.of(13, 0, 0);
-    LocalTime businessCloseTimeUtc = LocalTime.of(6, 0, 0);
+    ZonedDateTime businessOpenTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(8,0), ZoneId.of("America/New_York"));
+    ZonedDateTime businessCloseTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(22, 0), ZoneId.of("America/New_York"));
     
     @FXML private Label apptModLabel;
     @FXML private TextField locationTextField;
@@ -103,6 +104,7 @@ public class ApptModViewController implements Initializable {
 
         Optional<ButtonType> result = confirmation.showAndWait();
         if (result.get() == ButtonType.OK) {
+            int apptId = Integer.parseInt(apptIdTextField.getText());
             String title = titleTextField.getText();
             String description = descriptionTextField.getText();
             String location = locationTextField.getText();
@@ -165,12 +167,28 @@ public class ApptModViewController implements Initializable {
             int userId = userIdComboBox.getValue().getId();
             int contactId = contactComboBox.getValue().getId();
             
+            // Make sure end time is after start time and start time is before end time
+            if (UtcEndDateLdt.isBefore(UtcStartDateLdt)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Time");
+                alert.setHeaderText("Appointment end time must be after start time");
+                alert.showAndWait();
+                return;
+            } else if (UtcStartDateLdt.isAfter(UtcEndDateLdt)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Time");
+                alert.setHeaderText("Appointment start time must be before end time");
+                alert.showAndWait();
+                return;
+            }
+            
             // Loop through appointments to ensure there are no conflicts
             for (Appointment appt : (ObservableList<Appointment>)DataHandler.readAppointments()) {
                 // Check if customer already has any appointments
                 if (appt.getCustomerId() == custId) {
                     // Check if appointment dates are the same
-                    if (appt.getStartTime().toLocalDate().equals(UtcStartDateLdt.toLocalDate())) {
+                    if (appt.getStartTime().toLocalDate().equals(UtcStartDateLdt.toLocalDate()) &&
+                        appt.getId() != apptId) {
                         // Check if the appointment times are overlapping
                         if (appt.getStartTime().toLocalTime().isBefore(UtcEndDateLdt.toLocalTime()) ||
                             appt.getEndTime().toLocalTime().isAfter(UtcStartDateLdt.toLocalTime())) {
@@ -179,33 +197,32 @@ public class ApptModViewController implements Initializable {
                             alert.setHeaderText("Customer already has an appointment during this time period");
                             alert.showAndWait();
                             return;
-
-                        // Check if the appointment is before business hours
-                        } else if (UtcStartDateLdt.toLocalTime().isBefore(businessOpenTimeUtc)) {
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setTitle("Invalid Time");
-                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
-                                    "The proposed appointment begins before opening business hours");
-                            alert.showAndWait();
-                            return;
-
-                        // Check if the appointment is after business hours
-                        } else if (UtcEndDateLdt.toLocalTime().isAfter(businessCloseTimeUtc)) {
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setTitle("Invalid Time");
-                            alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
-                                    "The proposed appointment ends after closing business hours");
-                            alert.showAndWait();
-                            return;
                         }
+                    }
+                    // Check if the appointment is before business hours
+                    if (UtcStartDateZdt.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalTime().isBefore(businessOpenTimeUtc.toLocalTime())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Invalid Time");
+                        alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                "The proposed appointment begins before opening business hours");
+                        alert.showAndWait();
+                        return;
+
+                    // Check if the appointment is after business hours
+                    } else if (UtcEndDateZdt.withZoneSameInstant(ZoneId.of("America/New_York")).toLocalTime().isAfter(businessCloseTimeUtc.toLocalTime())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Invalid Time");
+                        alert.setHeaderText("Business hours are 8am - 10pm EST\n" + 
+                                "The proposed appointment ends after closing business hours");
+                        alert.showAndWait();
+                        return;
                     }
                 }
             }
-            
+
             // Create the appointment because time block is free for the customer
-            DataHandler.createAppointment(title, description, location, type, UtcStartDateLdt,
-            UtcEndDateLdt, LocalDateTime.now(), DataHandler.currentUser.getName(),
-            LocalDateTime.now(), DataHandler.currentUser.getName(), custId, userId, contactId);
+            DataHandler.updateAppointment(apptId, title, description, location, type, UtcStartDateLdt,
+            UtcEndDateLdt, LocalDateTime.now(), DataHandler.currentUser.getName(), custId, userId, contactId);
 
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             stage.setTitle("Main Menu");
