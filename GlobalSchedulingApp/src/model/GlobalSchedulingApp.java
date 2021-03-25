@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** The package of all of the data models and their methods used in the application. */
 package model;
 
 import javafx.application.Application;
@@ -21,6 +17,7 @@ import utilities.DataHandler;
  *
  * @author James Spencer
  */
+/** The main class that acts as the entry point of the application. */
 public class GlobalSchedulingApp extends Application{
     @Override
     public void start(Stage stage) throws Exception {
@@ -31,9 +28,12 @@ public class GlobalSchedulingApp extends Application{
         stage.show();
     }
     
-    /**
+    /** Main entry method for the scheduling application.
+     * 
      * @param args the command line arguments
+     * @throws SQLException Handles exceptions when using SQL queries to the database
      */
+
     public static void main(String[] args) throws SQLException {
 
         if (Locale.getDefault().toString().contains("fr")) {

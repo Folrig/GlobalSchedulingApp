@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** A package to handle utility classes and methods that are used across the application. */
 package utilities;
 
 import javafx.collections.FXCollections;
@@ -23,26 +19,46 @@ import java.util.ResourceBundle;
  *
  * @author James Spencer
  */
-// POTENTIAL TODO: USERS MIGHT HAVE APPOINTMENTS, MIGHT NOT BE NECESSARY FOR ASSESSMENT!
+/** A class that does the primary handling of data transfer between the client and the database. */
 public class DataHandler {
+        /** The user currently logged into the application. */
         public static User currentUser = null;
+        /** A Boolean to flag if appointments are to be added new or modified. */
         public static boolean addAppointment = false;
+        /** The selected appointment that should be modified. */
         public static Appointment apptToModify = null;
+        /** The selected Customer that should be modified. */
         public static Customer custToModify = null;
+        /** The connection class to be made to the database. */
         public static Connection connection = null;
+        /** All Appointment objects created by querying the database. */
         public static ObservableList<Appointment> allAppts = FXCollections.observableArrayList();
+        /** All Contact objects created by querying the database. */
         public static ObservableList<Contact> allContacts = FXCollections.observableArrayList();
+        /** All Country objects created by querying the database. */
         public static ObservableList<Country> allCountries = FXCollections.observableArrayList();
+        /** All Customer objects created by querying the database. */
         public static ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
+        /** All FirstLevelDivision objects created by querying the database. */
         public static ObservableList<FirstLevelDivision> allFirstLvlDivs = FXCollections.observableArrayList();
+        /** All User objects created by querying the database. */
         public static ObservableList<User> allUsers = FXCollections.observableArrayList();
+        /** A time formatter to parse date/times to human readable form. */
         public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        /** The query string that is to be utilized in a SQL statement. */
         private static String query;
+        /** The prepared statement that is to be sent to the database. */
         private static PreparedStatement prepStmt;
+        /** The currently ZoneId of the user logged into the application.
+         * Primarily for localization purposes
+         */
         public static ZoneId currentZoneId;
+        /** The ResourceBundle used for language localization. */
         public static ResourceBundle rb;
         
-        
+    /** A static class to read all appointments in the database.
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void setAllAppointments() throws SQLException {
         allAppts.clear();
         query = "SELECT * FROM appointments";
@@ -72,6 +88,22 @@ public class DataHandler {
             allAppts.add(appt);
         }
     }
+    /** A static class to handle creating and inserting new appointments into the database.
+     * @param title The title of the new appointment
+     * @param description The description of the new appointment
+     * @param location The location of the new appointment
+     * @param type The type of the new appointment
+     * @param startTime The start date and time of the new appointment
+     * @param endTime The ending date and time of the new appointment
+     * @param createDate The date and time that the new appointment was created
+     * @param createdBy The user that created the new appointment
+     * @param lastUpdate The date and time that the appointment was last updated
+     * @param lastUpdateBy The user that last updated the appointment
+     * @param customerId The customer ID associated with the new appointment
+     * @param userId The user ID associated with the new appointment
+     * @param contactId The contact ID associated with the new appointment
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void createAppointment(String title, String description, String location, String type, 
             LocalDateTime startTime, LocalDateTime endTime, LocalDateTime createDate, String createdBy, 
             LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) throws SQLException {
@@ -114,10 +146,27 @@ public class DataHandler {
             System.out.println("Problem in createAppointment!");
         }
     }
+    /** A static method to read all appointments that have been queried from the database.
+     * @return The list of all appointments in the database
+     */
     public static ObservableList readAppointments() {
         return allAppts;
     }
-    // UNTESTED, possible issue with lambda
+    /** A static method to modify and update a given appointment in the database.
+     * @param id The ID of the appointment that is to be modified
+     * @param title The title of the appointment to be modified
+     * @param description The description of the appointment to be modified
+     * @param location The location of the appointment to be modified
+     * @param type The type of the appointment to be modified
+     * @param startTime The start date and time of the appointment to be modified
+     * @param endTime The ending date and time of the appointment to be modified
+     * @param lastUpdate The date and time that the appointment was last updated
+     * @param lastUpdateBy The user that last updated the appointment
+     * @param customerId The customer ID associated with the appointment to be modified
+     * @param userId The user ID associated with the appointment to be modified
+     * @param contactId The contact ID associated with the appointment to be modified
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void updateAppointment(int id, String title, String description, String location, String type, 
             LocalDateTime startTime, LocalDateTime endTime,
             LocalDateTime lastUpdate, String lastUpdateBy, int customerId, int userId, int contactId) throws SQLException {
@@ -147,7 +196,10 @@ public class DataHandler {
             DataHandler.setAllAppointments();
         }
     }
-    // UNTESTED
+    /** A static method to delete a selected appointment from the database.
+     * @param id The ID of the appointment to be deleted
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void deleteAppointment(int id) throws SQLException {
         query = "DELETE FROM appointments WHERE Appointment_ID = ?";
         Query.setPreparedStatement(connection, query);
@@ -160,7 +212,9 @@ public class DataHandler {
         }
     }
     
-    // UNTESTED
+    /** A static method to read and create all appointment objects from the database.
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void setAllContacts() throws SQLException {
         allContacts.clear();
         query = "SELECT * FROM contacts";
@@ -178,7 +232,11 @@ public class DataHandler {
             allContacts.add(contact);      
         }
     }
-    // UNTESTED
+    /** A static method to create a new contact object and add it to the database.
+     * @param name The name of the contact to be created
+     * @param email The email address of the contact to be created
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void createContact(String name, String email) throws SQLException {
         if (!email.contains("@")) {
             System.out.println("Email in wrong format!");
@@ -210,10 +268,18 @@ public class DataHandler {
             System.out.println("Problem in createContact");
         }
     }
+    /** A static method that reads all of the contact records in the database.
+     * @return The list of all contacts in the database
+     */
     public static ObservableList readContacts() {
         return allContacts;
     }
-    // UNTESTED, possible issue with lambda
+    /** A static method to update a selected contact in the database.
+     * @param id The ID of the contact to be modified
+     * @param name The new name of the contact to be modified
+     * @param email The new email of the contact to be modified
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void updateContact(int id, String name, String email) throws SQLException {
         // Update entry in database
         query = "UPDATE contacts SET Contact_Name = ?, Email = ? WHERE Contact_ID = ?";
@@ -228,7 +294,10 @@ public class DataHandler {
             DataHandler.setAllContacts();
         }
     }
-    // UNTESTED
+    /** A static method to delete a selected contact from the database.
+     * @param id The ID of the contact to be deleted
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void deleteContact(int id) throws SQLException {
         query = "DELETE FROM contacts WHERE Contact_ID = ?";
         Query.setPreparedStatement(connection, query);
@@ -242,7 +311,9 @@ public class DataHandler {
         }
     }
     
-    // UNTESTED
+    /** A static method that reads and creates all country objects from the database records.
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void setAllCountries() throws SQLException {
         ObservableList<FirstLevelDivision> usaDivList = FXCollections.observableArrayList();
         ObservableList<FirstLevelDivision> ukDivList = FXCollections.observableArrayList();
@@ -305,10 +376,15 @@ public class DataHandler {
             }
         }
     }
+    /** A static method that retrieves all country objects that have been created.
+     * @return A list of all the available country objects
+     */
     public static ObservableList readCountries() {
         return allCountries;
     }
-    // UNTESTED
+    /** A static method that reads and creates all customer objects from database records.
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void setAllCustomers() throws SQLException {
         allCustomers.clear();
         query = "SELECT * FROM customers";
@@ -334,7 +410,18 @@ public class DataHandler {
             allCustomers.add(newCust);      
         }
     }
-    // UNTESTED
+    /** A static method that creates new customer objects and inserts their records into the database.
+     * @param name The name of the new customer entry
+     * @param address The address of the new customer entry
+     * @param postalCode The postal code of the new customer entry
+     * @param phoneNum The phone number of the new customer entry
+     * @param createDate The date and time the new customer entry was created
+     * @param createdBy The user who created the new customer entry
+     * @param lastUpdate The date and time the customer entry was updated
+     * @param lastUpdateBy The user who modified the customer entry
+     * @param divId The first level division of customer entry
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void createCustomer(String name, String address, String postalCode, String phoneNum,
             LocalDateTime createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy,
             int divId) throws SQLException {
@@ -373,10 +460,23 @@ public class DataHandler {
             System.out.println("Problem in createCustomer");
         }
     }
+    /** A static method that retrieves all the customer objects that have been created.
+     * @return A list of all customer objects within the database
+     */
     public static ObservableList readCustomers() {
         return allCustomers;
     }
-    // UNTESTED
+    /** A static method that modifies and updates a selected customer's entry in the database.
+     * @param id The ID of the customer to be modified
+     * @param name The name of the customer to be modified
+     * @param address The address of the customer to be modified
+     * @param postalCode The postal code of the customer to be modified
+     * @param phoneNum The phone number of the customer to be modified
+     * @param lastUpdate The date and time the customer entry was updated
+     * @param lastUpdateBy The user who modified the customer entry
+     * @param divId The first level division of customer entry
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void updateCustomer(int id, String name, String address, String postalCode,
             String phoneNum, LocalDateTime lastUpdate, String lastUpdateBy,
             int divId) throws SQLException {
@@ -400,7 +500,10 @@ public class DataHandler {
             DataHandler.setAllCustomers();
         }
     }
-    // UNTESTED
+    /** A static method that deletes a selected customer from the database.
+     * @param id The ID of the customer to be deleted
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void deleteCustomer(int id) throws SQLException {
         query = "DELETE FROM appointments WHERE Customer_ID = ?";
         Query.setPreparedStatement(connection, query);
@@ -419,7 +522,9 @@ public class DataHandler {
             DataHandler.setAllCustomers();
         }
     }
-    // UNTESTED
+    /** A static method that reads and creates all users from records in the database.
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void setAllUsers() throws SQLException {
         allUsers.clear();
         query = "SELECT * FROM users";
@@ -441,7 +546,15 @@ public class DataHandler {
             allUsers.add(user);
         }
     }
-    // UNTESTED
+    /** A static method that creates a new user object and inserts their record into the database.
+     * @param name The name of the new user entry
+     * @param password The password of the new user entry
+     * @param createDate The date and time the new user entry was created
+     * @param createdBy The user that created the new user entry
+     * @param lastUpdate The date and time the user entry was last modified
+     * @param lastUpdateBy The user that modified the user entry
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void createUser(String name, String password, LocalDateTime createDate,
             String createdBy, LocalDateTime lastUpdate, String lastUpdateBy) throws SQLException {
         query = "INSERT INTO users(User_Name, Password, Create_Date, Create_By, Last_Update, Last_Updated_by) " +
@@ -474,10 +587,22 @@ public class DataHandler {
             System.out.println("Problem in createUser");
         }
     }
+    /** A static method that retrieves all user objects that have been created.
+     * @return A list of all user objects that exist within the databse
+     */
     public static ObservableList readUsers() {
         return allUsers;
     }
-    // UNTESTED, possible issue with lambda
+    /** A static method that modifies and updates a selected user's database entry.
+     * @param id The ID of the user to modify
+     * @param name The name of the new user entry
+     * @param password The password of the new user entry
+     * @param createDate The date and time the new user entry was created
+     * @param createdBy The user that created the new user entry
+     * @param lastUpdate The date and time the user entry was last modified
+     * @param lastUpdateBy The user that modified the user entry
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void updateUser(int id, String name, String password, LocalDateTime createDate,
             String createdBy, LocalDateTime lastUpdate, String lastUpdateBy) throws SQLException {
         // Update entry in database
@@ -502,7 +627,10 @@ public class DataHandler {
             allUsers.add(user);
         }
     }
-    // UNTESTED
+    /** A static method that deletes a selected user object and its entry in the database.
+     * @param id The ID of the user to delete
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static void deleteUser(int id) throws SQLException {
         query = "DELETE FROM users WHERE User_ID = ?";
         Query.setPreparedStatement(connection, query);
@@ -514,7 +642,11 @@ public class DataHandler {
             DataHandler.setAllUsers();
         }
     }
-    
+    /** A static method to ensure that only the maximum ID is used when created a new appointment or customer.
+     * @param modelType The data model of which to find the maximum ID for to populate the ID text fields in the GUI
+     * @return The maximum ID integer value
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     public static int getNextIdValue(String modelType) throws SQLException {
         int nextId = 0;
         if (modelType == "Appointment") {
@@ -538,7 +670,6 @@ public class DataHandler {
                 nextId = results.getInt("MAX(Customer_ID)") + 1;
             }
         }
-        
         return nextId;
     }
 }

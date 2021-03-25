@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** The package that controls changes and I/O in the GUI. */
 package controller;
 
 import java.io.IOException;
@@ -37,21 +33,36 @@ import utilities.DataHandler;
  *
  * @author James Spencer
  */
+
+/** This class controls the GUI for creating new customers. */
 public class CustAddViewController implements Initializable {
+    /** The stage that will be used to set up the next GUI scene. */
     Stage stage;
+    /** The GUI window that will be shown upon exiting the customer add interface. */
     Parent scene;
+    /** A list of all available countries that users, customers, and contacts can be from. */
     ObservableList<Country> countries = FXCollections.observableArrayList();
     
+    /** The text field that displays that customer ID. */
     @FXML private TextField custIdTextField;
+    /** The text field that displays that customer address. */
     @FXML private TextField addressTextField;
+    /** The text field that displays that customer postal code. */
     @FXML private TextField postalCodeTextField;
+    /** The text field that displays that customer name. */    
     @FXML private TextField custNameTextField;
+    /** The text field that displays that customer phone number */
     @FXML private TextField phoneNumTextField;
+    /** The combo box used to select the customer's country. */
     @FXML private ComboBox<Country> countryComboBox;
+    /** The combo box used to select the customer's first level division. */
     @FXML private ComboBox<FirstLevelDivision> firstLvlDivComboBox;
-    @FXML private Button addCustButton;
-    @FXML private Button cancelButton;
 
+    /** This method handles when the button is clicked to create a customer.
+     * @throws IOException Handles exceptions between I/O devices
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     * @param event This is the mouse button click event that calls the method
+     */
     @FXML
     void onAddCustBtnClicked(ActionEvent event) throws SQLException, IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -93,6 +104,10 @@ public class CustAddViewController implements Initializable {
         }
     }
 
+    /** This method handles when the button is clicked to cancel creating a customer and return to the main menu.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onCancelBtnClicked(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -112,14 +127,19 @@ public class CustAddViewController implements Initializable {
         }
     }
     
+    /** This method handles when the country combo box value is changed.
+     When the country is changed, the first level division combo box values are changed to correspond with the selected country.
+     @param event This is the mouse button click event that calls the method
+     */
     @FXML
     void onCntryCmbBoxValueChange(ActionEvent event) {
         firstLvlDivComboBox.setItems(countryComboBox.getValue().getAllAssociatedDivisions());
         firstLvlDivComboBox.getSelectionModel().select(0);
     }
     
-    /**
-     * Initializes the controller class.
+    /** This method handles the GUI is first loaded and populates all relevant fields.
+     * @param url This is the URL that is calling the initialize method
+     * @param rb The corresponding resource bundle that the application is using
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {

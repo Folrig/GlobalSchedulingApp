@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** The package that controls changes and I/O in the GUI. */
 package controller;
 
 import java.io.IOException;
@@ -13,8 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -32,10 +26,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.Appointment;
@@ -46,32 +38,40 @@ import utilities.DataHandler;
  *
  * @author James Spencer
  */
+/** This class controls the GUI for displaying the main menu.
+ *  Populates all appointment information for display and modification.
+ */
 public class MainWindowViewController implements Initializable {
+    /** The stage that will be used to set up the next GUI scene. */
     Stage stage;
+    /** The GUI window that will be shown upon exiting the customer add interface. */
     Parent scene;
     
+    /** The table view that displays all of the appointment information */
     @FXML private TableView<Appointment> scheduleTableView;
+    /** The table column that displays each appointment ID number. */
     @FXML private TableColumn<Appointment, Integer> apptIdColumn;
+    /** The table column that displays each appointment title. */
     @FXML private TableColumn<Appointment, String> titleColumn;
+    /** The table column that displays each appointment description. */    
     @FXML private TableColumn<Appointment, String> descriptionColumn;
+    /** The table column that displays each appointment location. */    
     @FXML private TableColumn<Appointment, String> locationColumn;
+    /** The table column that displays each appointment contact ID. */    
     @FXML private TableColumn<Appointment, String> contactColumn;
+    /** The table column that displays each appointment type. */
     @FXML private TableColumn<Appointment, String> typeColumn;
+    /** The table column that displays each appointment local start time. */    
     @FXML private TableColumn<Appointment, LocalDateTime> startColumn;
+    /** The table column that displays each appointment local end time. */    
     @FXML private TableColumn<Appointment, LocalDateTime> endColumn;
+    /** The table column that displays each appointment customer ID. */    
     @FXML private TableColumn<Appointment, String> custIdColumn;
-    @FXML private Button apptAddButton;
-    @FXML private Button updateApptButton;
-    @FXML private Button custAudButton;
-    @FXML private Button deleteApptButton;
-    @FXML private RadioButton allApptViewRadioBtn;
-    @FXML private RadioButton weeklyViewRadioButton;
-    @FXML private RadioButton monthlyViewRadioButton;
-    @FXML private ToggleGroup viewRadioToggleGroup;
-    @FXML private Button reportOneButton;
-    @FXML private Button reportTwoButton;
-    @FXML private Button reportThreeButton;
 
+    /** This method handles when the button is clicked to load the GUI screen for adding a new appointment.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onApptAddButtonClicked(ActionEvent event) throws IOException {
         DataHandler.addAppointment = true;
@@ -82,6 +82,10 @@ public class MainWindowViewController implements Initializable {
         stage.show();
     }
     
+    /** This method handles when the button is clicked to load the GUI screen for modifying the appointment selected in the table view.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onUpdateApptButtonClicked(ActionEvent event) throws IOException {
         DataHandler.addAppointment = false;
@@ -96,6 +100,10 @@ public class MainWindowViewController implements Initializable {
         }
     }
 
+    /** This method handles when the button is clicked to load the GUI screen for adding, updating, or deleting a customer.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onCustAudButtonClicked(ActionEvent event) throws IOException {
         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
@@ -105,6 +113,10 @@ public class MainWindowViewController implements Initializable {
         stage.show();
     }
 
+    /** This method handles when the button is clicked to delete the appointment selected in the table view.
+     * @param event This is the mouse button click event that calls the method
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     @FXML
     void onDeleteApptButtonClicked(ActionEvent event) throws SQLException {
         if(scheduleTableView.getSelectionModel().getSelectedItem() != null){
@@ -123,26 +135,56 @@ public class MainWindowViewController implements Initializable {
         }
     }
 
+    /** This method handles when the button is clicked load the GUI screen for the first report type.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
-    void onReportOneBtnclicked(ActionEvent event) {
-
+    void onReportOneBtnclicked(ActionEvent event) throws IOException {
+        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+        stage.setTitle("Appointment By Type And Month Report");
+        scene = FXMLLoader.load(getClass().getResource("/view/ReportOneView.fxml"));
+        stage.setScene(new Scene(scene));
+        stage.show();
     }
 
+    /** This method handles when the button is clicked load the GUI screen for the second report type.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */    
     @FXML
-    void onReportTwoBtnClicked(ActionEvent event) {
-
+    void onReportTwoBtnClicked(ActionEvent event) throws IOException {
+        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+        stage.setTitle("Schedules By Contact");
+        scene = FXMLLoader.load(getClass().getResource("/view/ReportTwoView.fxml"));
+        stage.setScene(new Scene(scene));
+        stage.show();
     }
-    
+
+    /** This method handles when the button is clicked load the GUI screen for the third report type.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */    
     @FXML
-    void onReportThreeBtnClicked(ActionEvent event) {
-
+    void onReportThreeBtnClicked(ActionEvent event) throws IOException {
+        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+        stage.setTitle("Summary Of All Items");
+        scene = FXMLLoader.load(getClass().getResource("/view/ReportThreeView.fxml"));
+        stage.setScene(new Scene(scene));
+        stage.show();
     }
-    
+
+    /** This method handles when the radio button is toggled adjust the table view to show ALL appointments.
+     * @param event This is the mouse button click event that calls the method
+     */    
     @FXML
     void onAllApptRadioBtnTog(ActionEvent event) {
         populateScheduleTableView();
     }
-    
+
+    /** This method handles when the radio button is toggled adjust the table view to show appointments only for the current month.
+     * @param event This is the mouse button click event that calls the method
+     */      
     @FXML
     void onMonthlyRdoBtnTog(ActionEvent event) {
         ObservableList<Appointment> monthlyAppointments = FXCollections.observableArrayList();
@@ -162,7 +204,10 @@ public class MainWindowViewController implements Initializable {
         endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
         custIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
     }
-    
+
+    /** This method handles when the radio button is toggled adjust the table view to show appointments only for the current week.
+     * @param event This is the mouse button click event that calls the method
+     */ 
     @FXML
     void onWeeklyRadioBtnTog(ActionEvent event) {
         ObservableList<Appointment> weeklyAppointments = FXCollections.observableArrayList();
@@ -192,6 +237,7 @@ public class MainWindowViewController implements Initializable {
         custIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
     }
     
+    /** This method populates the schedule table view with all existing appointments and their information. */
     private void populateScheduleTableView() {
         scheduleTableView.setItems(DataHandler.readAppointments());
         apptIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -205,11 +251,10 @@ public class MainWindowViewController implements Initializable {
         custIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
     }
 
-    /**
-     * Initializes the controller class.
-     * @param url
-     * @param rb
-     */
+    /** This method handles the GUI is first loaded and populates all relevant fields.
+     * @param url This is the URL that is calling the initialize method
+     * @param rb The corresponding resource bundle that the application is using
+     */    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -230,7 +275,7 @@ public class MainWindowViewController implements Initializable {
                     LocalDate apptDate = appt.getStartTime().toLocalDate();
                     String formattedDate = apptDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                     String apptTime = appt.getStartTime().toLocalTime().toString();
-                    LocalDateTime tempDateTime = LocalDateTime.parse(apptTime, DateTimeFormatter.ISO_DATE_TIME);
+                    // LocalDateTime tempDateTime = LocalDateTime.parse(apptTime, DateTimeFormatter.ISO_DATE_TIME);
                     String content = "You have an upcoming appointment with ID number " + appt.getId() +
                             " on " + formattedDate + " at " + apptTime;
                             // tempTime.format(DateTimeFormatter.ofPattern("HH:mm"));

@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** The package that controls changes and I/O in the GUI. */
 package controller;
 
 import java.io.IOException;
@@ -11,7 +7,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -41,40 +36,67 @@ import model.Appointment;
 import utilities.DataHandler;
 
 /**
- *
+ * FXML Controller class
+ * 
  * @author James Spencer
  */
+
+/** This class controls the GUI for creating new appointments. */
 public class ApptAddViewController implements Initializable {
+    /** The stage that will be used to set up the next GUI scene. */
     Stage stage;
+    /** The GUI window that will be shown upon exiting the customer add interface. */
     Parent scene;
     
+    /** A list of all available hours that can be selected for an appointment. */
     ObservableList<String> hours = FXCollections.observableArrayList();
+    /** A list of all available minutes that can be selected for an appointment. */  
     ObservableList<String> minutes = FXCollections.observableArrayList();
+    /** A list of all available meridiem (AM/PM) that can be selected for an appointment. */ 
     ObservableList<String> meridiem = FXCollections.observableArrayList();
     
+    /** The opening business hours that can be offset by zone to ensure appointment times are made correctly. */    
     ZonedDateTime businessOpenTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(8,0), ZoneId.of("America/New_York"));
+    /** The closing business hours that can be offset by zone to ensure appointment times are made correctly. */        
     ZonedDateTime businessCloseTimeUtc = ZonedDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(22, 0), ZoneId.of("America/New_York"));
     
-    @FXML private Label apptModLabel;
+    /** The text field used to input the location of the new appointment. */
     @FXML private TextField locationTextField;
+    /** The date picker used to select the starting month and day of the new appointment. */
     @FXML private DatePicker startDatePicker;
+    /** The combo box used to select the starting hour of the new appointment time. */
     @FXML private ComboBox<String> startHourComboBox;
+    /** The combo box used to select the starting minute of the new appointment time. */
     @FXML private ComboBox<String> startMinuteComboBox;
+    /** The combo box used to select the starting meridem (AM/PM) of the new appointment time. */
     @FXML private ComboBox<String> startAmPmComboBox;
+    /** The text field that displays the ID of the new appointment. */
     @FXML private TextField apptIdTextField;
+    /** The date picker used to select the ending month and day of the new appointment. */
     @FXML private DatePicker endDatePicker;
+    /** The combo box used to select the ending hour of the new appointment time. */
     @FXML private ComboBox<String> endHourComboBox;
+    /** The combo box used to select the ending minute of the new appointment time. */
     @FXML private ComboBox<String> endMinuteComboBox;
+    /** The combo box used to select the meridiem (AM/PM) of the new appointment time. */
     @FXML private ComboBox<String> endAmPmComboBox;
+    /** The combo box used to select the corresponding contact ID for the new appointment. */
     @FXML private ComboBox<Contact> contactComboBox;
+    /** The combo box used to select the corresponding user ID for the new appointment. */
     @FXML private ComboBox<User> userIdComboBox;
+    /** The combo box used to select the corresponding customer ID for the new appointment. */
     @FXML private ComboBox<Customer> custIdComboBox;
+    /** The text field used to input the title of the new appointment. */
     @FXML private TextField titleTextField;
+    /** The text field used to input the type of the new appointment. */
     @FXML public TextField typeTextField;
+    /** The text field used to input the description of the new appointment. */
     @FXML private TextField descriptionTextField;
-    @FXML private Button cancelButton;
-    @FXML private Button addApptButton;
     
+    /** This method handles when the button is clicked to cancel creating a customer and return to the main menu.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onCancelButtonClicked(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -93,7 +115,12 @@ public class ApptAddViewController implements Initializable {
             stage.centerOnScreen();
         }
     }
-    
+
+   /** This method handles when the button is clicked to create a new appointment.
+     * @throws IOException Handles exceptions between I/O devices
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     * @param event This is the mouse button click event that calls the method
+     */
     @FXML
     void onAddApptButtonClicked(ActionEvent event) throws SQLException, IOException {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
@@ -232,6 +259,10 @@ public class ApptAddViewController implements Initializable {
         }
     }
 
+    /** This method handles the GUI is first loaded and populates all relevant fields.
+     * @param url This is the URL that is calling the initialize method
+     * @param rb The corresponding resource bundle that the application is using
+     */    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Set up all GUI controls with base values

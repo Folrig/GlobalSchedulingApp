@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** The package that controls changes and I/O in the GUI. */
 package controller;
 
 import java.io.IOException;
@@ -41,35 +37,56 @@ import utilities.DataHandler;
  *
  * @author James Spencer
  */
+/** This class controls the GUI for modifying existing customers. */
 public class CustModViewController implements Initializable {
+    /** The stage that will be used to set up the next GUI scene. */
     Stage stage;
+    /** The GUI window that will be shown upon exiting the customer add interface. */
     Parent scene;
+    /** A list of all available countries that users, customers, and contacts can be from. */
     ObservableList<Country> countries = FXCollections.observableArrayList();
     
-    @FXML private Button addCustButton;
-    @FXML private Button updateCustButton;
-    @FXML private Button deleteCustButton;
+    /** The table view that displays all existing customer information. */
     @FXML private TableView<Customer> custInfoTableView;
+    /** The table column that displays all existing customer ID values. */
     @FXML private TableColumn<Customer, Integer> custIdColumn;
+    /** The table column that displays all existing customer name values. */
     @FXML private TableColumn<Customer, String> custNameColumn;
+    /** The table column that displays all existing customer address values. */
     @FXML private TableColumn<Customer, String> addressColumn;
+    /** The table column that displays all existing customer postal code values. */
     @FXML private TableColumn<Customer, Integer> postalCodeColumn;
+    /** The table column that displays all existing customer first level division ID values. */
     @FXML private TableColumn<Customer, String> frstLvlDivColumn;
-    @FXML private TableColumn<Customer, String> countryColumn;
+    /** The table column that displays all existing customer phone number values. */
     @FXML private TableColumn<Customer, String> phoneColumn;
+    /** The table column that displays the dates the customer record was created. */
     @FXML private TableColumn<Customer, String> createDateColumn;
+    /** The table column that displays the user that created the customer record. */
     @FXML private TableColumn<Customer, String> createByColumn;
+    /** The table column that displays when the customer record was last updated. */
     @FXML private TableColumn<Customer, LocalDateTime> lastUpdateColumn;
+    /** The table column that displays the user who last updated the customer record. */
     @FXML private TableColumn<Customer, String> lastUpdateByColumn;
+    /** The text field that displays the selected customer ID value. */
     @FXML private TextField custIdTextField;
+    /** The text field that displays and modifies the selected customer address. */
     @FXML private TextField addressTextField;
+    /** The text field that displays and modifies the selected customer postal code. */
     @FXML private TextField postalCodeTextField;
+    /** The combo box used to modify the existing customer country. */
     @FXML private ComboBox<Country> countryComboBox;
+    /** The combo box used to modify the existing customer first level division. */
     @FXML private ComboBox<FirstLevelDivision> firstLvlDivComboBox;
+    /** The text field that displays and modifies the selected customer name. */
     @FXML private TextField custNameTextField;
+    /** The text field that displays and modifies the selected phone number. */
     @FXML private TextField phoneNumTextField;
-    @FXML private Button backToMainButton;
 
+    /** This method handles when the button is clicked to modify an existing a customer.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onAddCustBtnClicked(ActionEvent event) throws IOException {
         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
@@ -80,6 +97,10 @@ public class CustModViewController implements Initializable {
         stage.centerOnScreen();
     }
 
+    /** This method handles when the button is clicked to cancel modifying a customer and return to the main menu.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     */
     @FXML
     void onBackBtnClicked(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -99,12 +120,21 @@ public class CustModViewController implements Initializable {
         }
     }
 
+    /** This method handles when the country combo box value is changed.
+     * When the country is changed, the first level division combo box values are changed to correspond with the selected country.
+     * @param event This is the mouse button click event that calls the method
+     */
     @FXML
     void onCntryCmbBoxValueChange(ActionEvent event) {
         firstLvlDivComboBox.setItems(countryComboBox.getValue().getAllAssociatedDivisions());
         firstLvlDivComboBox.getSelectionModel().select(0);
     }
 
+    /** This method handles when the button to delete a selected customer is clicked.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     @FXML
     void onDeleteCustBtnClicked(ActionEvent event) throws IOException, SQLException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -125,6 +155,11 @@ public class CustModViewController implements Initializable {
         }
     }
 
+    /** This method handles when the button to update the selected customer with new values is clicked.
+     * @param event This is the mouse button click event that calls the method
+     * @throws IOException Handles exceptions between I/O devices
+     * @throws SQLException Handles exceptions when using SQL queries to the database
+     */
     @FXML
     void onUpdateCustBtnClicked(ActionEvent event) throws IOException, SQLException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -166,6 +201,9 @@ public class CustModViewController implements Initializable {
         }
     }
     
+    /** This method populates the text fields and combo boxes with the existing customer's current values.
+     * @param event This is the mouse button click event that calls the method
+     */
     @FXML
     void onRowClicked(MouseEvent event) {
         Customer cust = custInfoTableView.getSelectionModel().getSelectedItem();
@@ -190,6 +228,7 @@ public class CustModViewController implements Initializable {
         }
     }
     
+    /** This method populates the table view with existing customer data. */
     private void populateCustomerTableView() {
         custInfoTableView.setItems(DataHandler.readCustomers());
         custIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -205,8 +244,8 @@ public class CustModViewController implements Initializable {
     }
     /**
      * Initializes the controller class.
-     * @param url
-     * @param rb
+     * @param url This is the URL that is calling the initialize method
+     * @param rb The corresponding resource bundle that the application is using
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
