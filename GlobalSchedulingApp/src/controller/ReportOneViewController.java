@@ -99,6 +99,7 @@ public class ReportOneViewController implements Initializable {
         }
     }
     
+    /** A subclass that holds data of appointment quantity by month. */
     public class AppointmentByMonth {
         /** This integer data holds the quantity of appointments of the corresponding month. */        
         private int qty;
@@ -159,7 +160,9 @@ public class ReportOneViewController implements Initializable {
     /** This method populates the report table view with all existing appointment quantities per type and month.
      * This method utilizes two lambda expressions in order to utilize functional programming and minimize
      * the amount of maintenance necessary on a line of code by using the streaming functions of hash maps,
-     * both for appointments by type and appointments by month
+     * both for appointments by type and appointments by month. The first lambda expression is used to filter out
+     * the appointments and quantify them based upon their type. The second lambda expression is used to filter
+     * out appointments and quantify them based upon the month on which they occur.
      */    
     private void populateReportTableView() {
         HashMap<String, Integer> apptByType = new HashMap<>();

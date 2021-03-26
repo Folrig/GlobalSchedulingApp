@@ -53,15 +53,14 @@
                <columns>
                   <TableColumn fx:id="custIdColumn" text="Customer_ID" />
                   <TableColumn fx:id="custNameColumn" prefWidth="100.0" text="Customer_Name" />
-                  <TableColumn fx:id="addressColumn" prefWidth="94.0" text="Address" />
-                  <TableColumn fx:id="postalCodeColumn" prefWidth="110.0" text="Postal_Code" />
-                  <TableColumn fx:id="frstLvlDivColumn" prefWidth="110.0" text="First_Level_Div" />
-                  <TableColumn fx:id="countryColumn" prefWidth="107.0" text="Country" />
-                  <TableColumn fx:id="phoneColumn" prefWidth="106.0" text="Phone" />
-                  <TableColumn fx:id="createDateColumn" prefWidth="91.0" text="Create_Date" />
-                  <TableColumn fx:id="createByColumn" prefWidth="94.0" text="Created_By" />
-                  <TableColumn fx:id="lastUpdateColumn" prefWidth="87.0" text="Last_Update" />
-                  <TableColumn fx:id="lastUpdateByColumn" prefWidth="70.0" text="Last_Updated_by" />
+                  <TableColumn fx:id="addressColumn" prefWidth="115.0" text="Address" />
+                  <TableColumn fx:id="postalCodeColumn" prefWidth="113.0" text="Postal_Code" />
+                  <TableColumn fx:id="frstLvlDivColumn" prefWidth="107.0" text="First_Level_Div" />
+                  <TableColumn fx:id="phoneColumn" prefWidth="132.0" text="Phone" />
+                  <TableColumn fx:id="createDateColumn" prefWidth="119.0" text="Create_Date" />
+                  <TableColumn fx:id="createByColumn" prefWidth="107.0" text="Created_By" />
+                  <TableColumn fx:id="lastUpdateColumn" prefWidth="145.0" text="Last_Update" />
+                  <TableColumn fx:id="lastUpdateByColumn" prefWidth="151.0" text="Last_Updated_by" />
                </columns>
                <GridPane.margin>
                   <Insets left="15.0" right="15.0" />

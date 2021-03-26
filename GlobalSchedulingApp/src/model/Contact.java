@@ -94,9 +94,9 @@ public class Contact {
         return appointments.remove(appt);
     }
     
-    /** Overrides the Java toString method to return the value of the ID as a String data type. */
+    /** Overrides the Java toString method to return the value of the name as a String data type. */
     @Override
     public String toString() {
-        return String.valueOf(this.getId());
+        return String.valueOf(this.getName());
     }
 }
